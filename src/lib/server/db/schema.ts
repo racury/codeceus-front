@@ -311,3 +311,71 @@ export const roadmapEdgesRelations = relations(roadmapEdges, ({ one }) => ({
 		relationName: 'incomingEdges'
 	})
 }));
+
+export const competitions = pgTable('competitions', {
+	id: serial('id').primaryKey(),
+	title: text('title').notNull(),
+	description: text('description'),
+	startTime: timestamp('start_time').notNull(),
+	endTime: timestamp('end_time').notNull(),
+	createdById: text('created_by_id')
+		.notNull()
+		.references(() => user.id),
+	createdAt: timestamp('created_at').defaultNow().notNull(),
+	updatedAt: timestamp('updated_at').defaultNow().notNull()
+});
+
+export const competitionProblems = pgTable('competition_problems', {
+	competitionId: integer('competition_id')
+		.notNull()
+		.references(() => competitions.id, { onDelete: 'cascade' }),
+	problemId: integer('problem_id')
+		.notNull()
+		.references(() => problems.id, { onDelete: 'cascade' }),
+	order: integer('order').notNull().default(0)
+}, (t) => [
+	primaryKey({ columns: [t.competitionId, t.problemId] })
+]);
+
+export const competitionParticipants = pgTable('competition_participants', {
+	competitionId: integer('competition_id')
+		.notNull()
+		.references(() => competitions.id, { onDelete: 'cascade' }),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	joinedAt: timestamp('joined_at').defaultNow().notNull()
+}, (t) => [
+	primaryKey({ columns: [t.competitionId, t.userId] })
+]);
+
+export const competitionsRelations = relations(competitions, ({ one, many }) => ({
+	createdBy: one(user, {
+		fields: [competitions.createdById],
+		references: [user.id]
+	}),
+	problems: many(competitionProblems),
+	participants: many(competitionParticipants)
+}));
+
+export const competitionProblemsRelations = relations(competitionProblems, ({ one }) => ({
+	competition: one(competitions, {
+		fields: [competitionProblems.competitionId],
+		references: [competitions.id]
+	}),
+	problem: one(problems, {
+		fields: [competitionProblems.problemId],
+		references: [problems.id]
+	})
+}));
+
+export const competitionParticipantsRelations = relations(competitionParticipants, ({ one }) => ({
+	competition: one(competitions, {
+		fields: [competitionParticipants.competitionId],
+		references: [competitions.id]
+	}),
+	user: one(user, {
+		fields: [competitionParticipants.userId],
+		references: [user.id]
+	})
+}));
