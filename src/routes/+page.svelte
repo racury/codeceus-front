@@ -6,12 +6,16 @@
 
 	let { data } = $props();
 	const featuredProblems = $derived(data.featuredProblems);
+	const upcomingContests = $derived(data.upcomingContests);
 
-	const upcomingContests = [
-
-		{ title: '주간 챌린지 #42', date: '내일, 20:00', participants: 1205 },
-		{ title: 'Svelte 5 특별 대회', date: '4월 25일, 14:00', participants: 540 }
-	];
+	const formatDate = (date: Date) => {
+		return new Intl.DateTimeFormat('ko-KR', {
+			month: 'long',
+			day: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit'
+		}).format(date);
+	};
 </script>
 
 <div class="flex flex-col gap-16 pb-16">
@@ -65,37 +69,38 @@
 				</div>
 				<div class="grid gap-4">
 					{#each featuredProblems as problem}
-						<Card.Root class="group cursor-pointer transition-all hover:border-primary">
-							<Card.Content class="flex items-center justify-between p-4">
-								<div class="flex items-center gap-4">
-									<div class="w-12 font-mono text-sm text-muted-foreground">{problem.id}</div>
-									<div>
-										<h3 class="font-semibold transition-colors group-hover:text-primary">
-											{problem.title}
-										</h3>
-										<div class="mt-1 flex gap-2">
-											<Badge variant="outline" class="h-5 text-[10px]">{problem.category}</Badge>
+						<a href={`/problems/${problem.id}`} class="block">
+							<Card.Root class="group transition-all hover:border-primary">
+								<Card.Content class="flex items-center justify-between p-4">
+									<div class="flex items-center gap-4">
+										<div class="w-12 font-mono text-sm text-muted-foreground">{problem.id}</div>
+										<div>
+											<h3 class="font-semibold transition-colors group-hover:text-primary">
+												{problem.title}
+											</h3>
+											<div class="mt-1 flex gap-2">
+												<Badge variant="outline" class="h-5 text-[10px]">{problem.category}</Badge>
+											</div>
 										</div>
-
 									</div>
-								</div>
-								<div class="flex items-center gap-4">
-									<Badge
-										variant={problem.difficulty === '쉬움'
-											? 'secondary'
-											: problem.difficulty === '보통'
-												? 'default'
-												: 'destructive'}
-										class="px-2"
-									>
-										{problem.difficulty}
-									</Badge>
-									<Button variant="ghost" size="icon" class="rounded-full">
-										<Zap class="h-4 w-4" />
-									</Button>
-								</div>
-							</Card.Content>
-						</Card.Root>
+									<div class="flex items-center gap-4">
+										<Badge
+											variant={problem.difficulty === '쉬움'
+												? 'secondary'
+												: problem.difficulty === '보통'
+													? 'default'
+													: 'destructive'}
+											class="px-2"
+										>
+											{problem.difficulty}
+										</Badge>
+										<Button variant="ghost" size="icon" class="rounded-full">
+											<Zap class="h-4 w-4" />
+										</Button>
+									</div>
+								</Card.Content>
+							</Card.Root>
+						</a>
 					{/each}
 				</div>
 			</div>
@@ -116,16 +121,22 @@
 								<div class="mt-4 flex flex-col gap-4">
 									<div class="flex items-center justify-between text-sm">
 										<span class="text-muted-foreground">시작 시간</span>
-										<span class="font-medium">{contest.date}</span>
+										<span class="font-medium">{formatDate(contest.date)}</span>
 									</div>
 									<div class="flex items-center justify-between text-sm">
 										<span class="text-muted-foreground">참가 인원</span>
 										<span class="font-medium">{contest.participants}명</span>
 									</div>
-									<Button class="mt-2 w-full">지금 신청하기</Button>
+									<Button class="mt-2 w-full" href={`/competitions/${contest.id}`}>지금 신청하기</Button>
 								</div>
 							</Card.Content>
 						</Card.Root>
+					{:else}
+						<div
+							class="flex h-32 flex-col items-center justify-center rounded-lg border border-dashed text-center"
+						>
+							<p class="text-sm text-muted-foreground">현재 예정된 대회가 없습니다.</p>
+						</div>
 					{/each}
 
 					<Card.Root class="border-dashed">

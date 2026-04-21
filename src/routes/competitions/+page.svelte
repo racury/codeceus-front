@@ -1,110 +1,102 @@
 <script lang="ts">
+	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
-	import { Button } from '$lib/components/ui/button';
-	import { Trophy, Clock, Users, Calendar } from '@lucide/svelte';
+	import { Trophy, Calendar, Users, Plus, Timer } from '@lucide/svelte';
+	import { cn } from '$lib/utils';
 
-	const competitions = [
-		{
-			title: '주간 콘테스트 #42',
-			status: 'active',
-			timeLeft: '01:24:05',
-			participants: 1205,
-			type: '공개',
-			description: '4개의 알고리즘 문제로 구성된 정기 주간 챌린지입니다.'
-		},
-		{
-			title: 'Svelte 5 출시 기념 특별 대회',
-			status: 'upcoming',
-			startTime: '4월 25일, 14:00',
-			participants: 540,
-			type: '특별',
-			description: '반응성과 최적화에 초점을 맞춘 문제들로 Svelte 5의 출시를 축하하세요.'
-		},
-		{
-			title: '알고리즘 마스터즈 2024',
-			status: 'upcoming',
-			startTime: '5월 1일, 10:00',
-			participants: 3200,
-			type: '메이저',
-			description: '올해 가장 큰 규모의 대회입니다. 상위 10위에게는 특별한 상품이 주어집니다.'
-		},
-		{
-			title: '자료구조 블리츠',
-			status: 'past',
-			startTime: '4월 15일, 18:00',
-			participants: 890,
-			type: '공개',
-			description: '효율적인 자료구조 활용에 집중한 빠른 템포의 대회입니다.'
-		}
-	];
+	let { data } = $props();
+
+	function getStatus(start: Date, end: Date) {
+		const now = new Date();
+		if (now < start)
+			return { label: '예정됨', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' };
+		if (now > end)
+			return {
+				label: '종료됨',
+				color: 'bg-muted text-muted-foreground border-muted-foreground/20'
+			};
+		return { label: '진행 중', color: 'bg-green-500/10 text-green-500 border-green-500/20' };
+	}
 </script>
 
-<div class="container mx-auto px-4 py-10">
-	<div class="flex flex-col gap-8">
-		<div class="flex flex-col gap-4 md:flex-row md:items-center justify-between">
-			<div>
-				<h1 class="text-3xl font-bold tracking-tight">대회</h1>
-				<p class="mt-1 text-muted-foreground">콘테스트에 참여하여 다른 사람들과 경쟁하고 실력을 증명하세요.</p>
-			</div>
-			<Button class="flex gap-2">
-				<Trophy class="h-4 w-4" /> 내 신청 내역
-			</Button>
+<div class="container mx-auto max-w-5xl px-4 py-8">
+	<div class="mb-8 flex items-center justify-between">
+		<div>
+			<h1 class="text-3xl font-extrabold tracking-tight">대회</h1>
+			<p class="mt-2 text-muted-foreground">정해진 시간 동안 실력을 겨뤄보세요.</p>
 		</div>
+		{#if data.user?.role === 'admin'}
+			<Button href="/competitions/create" class="gap-2">
+				<Plus class="h-4 w-4" /> 새 대회 만들기
+			</Button>
+		{/if}
+	</div>
 
-		<div class="grid gap-6">
-			{#each competitions as contest}
-				<Card.Root class={contest.status === 'active' ? 'border-primary ring-1 ring-primary/20' : ''}>
-					<Card.Content class="p-6">
-						<div class="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-							<div class="flex-1 space-y-4">
-								<div class="flex items-center gap-3">
-									{#if contest.status === 'active'}
-										<Badge class="animate-pulse bg-red-500 hover:bg-red-600">진행 중</Badge>
-									{:else if contest.status === 'upcoming'}
-										<Badge variant="secondary">예정됨</Badge>
-									{:else}
-										<Badge variant="outline">종료됨</Badge>
-									{/if}
-									<Badge variant="outline">{contest.type}</Badge>
-								</div>
-
-								<div>
-									<h2 class="text-2xl font-bold">{contest.title}</h2>
-									<p class="mt-1 text-muted-foreground">{contest.description}</p>
-								</div>
-
-								<div class="flex flex-wrap gap-6 text-sm">
-									{#if contest.status === 'active'}
-										<div class="flex items-center gap-2 font-semibold text-red-500">
-											<Clock class="h-4 w-4" /> 종료까지: {contest.timeLeft}
-										</div>
-									{:else}
-										<div class="flex items-center gap-2 text-muted-foreground">
-											<Calendar class="h-4 w-4" /> 시작: {contest.startTime}
-										</div>
-									{/if}
-									<div class="flex items-center gap-2 text-muted-foreground">
-										<Users class="h-4 w-4" />
-										{contest.participants}명 참여 중
-									</div>
-								</div>
-							</div>
-
-							<div class="flex min-w-[150px] flex-col gap-2">
-								{#if contest.status === 'active'}
-									<Button class="w-full">대회 입장</Button>
-								{:else if contest.status === 'upcoming'}
-									<Button class="w-full">참가 신청</Button>
-								{:else}
-									<Button variant="outline" class="w-full">순위표 보기</Button>
-								{/if}
-								<Button variant="ghost" class="w-full">상세 정보</Button>
+	<div class="grid gap-6">
+		{#each data.competitions as comp}
+			{@const status = getStatus(new Date(comp.startTime), new Date(comp.endTime))}
+			<Card.Root class="overflow-hidden transition-all hover:border-primary/30">
+				<div class="flex flex-col md:flex-row">
+					<div class="flex-1 p-6">
+						<div class="mb-4 flex items-center gap-3">
+							<Badge variant="outline" class={cn('font-bold', status.color)}>
+								{status.label}
+							</Badge>
+							<div class="flex items-center gap-1.5 text-xs text-muted-foreground">
+								<Calendar class="h-3.5 w-3.5" />
+								{new Date(comp.startTime).toLocaleString()} ~ {new Date(
+									comp.endTime
+								).toLocaleString()}
 							</div>
 						</div>
-					</Card.Content>
-				</Card.Root>
-			{/each}
-		</div>
+
+						<Card.Title class="mb-2 text-2xl">
+							<a href={`/competitions/${comp.id}`} class="hover:underline">
+								{comp.title}
+							</a>
+						</Card.Title>
+						<Card.Description class="line-clamp-2 text-sm leading-relaxed">
+							{comp.description || '대회 설명이 없습니다.'}
+						</Card.Description>
+
+						<div class="mt-6 flex flex-wrap items-center gap-6">
+							<div class="flex items-center gap-2 text-sm">
+								<Users class="h-4 w-4 text-muted-foreground" />
+								<span class="font-medium">{comp.participants.length}명 참여 중</span>
+							</div>
+							<div class="flex items-center gap-2 text-sm">
+								<Trophy class="h-4 w-4 text-muted-foreground" />
+								<span class="font-medium">{comp.problems.length}문제</span>
+							</div>
+							<div class="flex items-center gap-2 text-sm">
+								<span class="text-xs text-muted-foreground">작성자: {comp.createdBy.name}</span>
+							</div>
+						</div>
+					</div>
+					<div
+						class="flex min-w-[200px] flex-col items-center justify-center gap-3 border-t bg-muted/30 p-6 md:border-t-0 md:border-l"
+					>
+						<Button href={`/competitions/${comp.id}`} class="w-full font-bold">상세 보기</Button>
+						{#if status.label === '진행 중'}
+							<p class="flex items-center gap-1 text-[10px] text-muted-foreground">
+								<Timer class="h-3 w-3" /> 지금 바로 참여 가능
+							</p>
+						{/if}
+					</div>
+				</div>
+			</Card.Root>
+		{/each}
+
+		{#if data.competitions.length === 0}
+			<div
+				class="flex flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/20 p-20 text-center"
+			>
+				<Trophy class="mb-4 h-12 w-12 text-muted-foreground/30" />
+				<h3 class="text-xl font-bold">진행 예정인 대회가 없습니다.</h3>
+				<p class="mt-2 text-muted-foreground">새로운 대회가 열릴 때까지 연습 문제를 풀어보세요!</p>
+				<Button variant="outline" href="/problems" class="mt-6">문제 풀러 가기</Button>
+			</div>
+		{/if}
 	</div>
 </div>
