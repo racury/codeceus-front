@@ -1,6 +1,6 @@
-# Gemini CLI Project Instructions - racury-oj
+# Gemini CLI Project Instructions - codeceus
 
-This file contains foundational mandates for the Gemini CLI when working on the `racury-oj` project. These instructions take precedence over general defaults.
+This file contains foundational mandates for the Gemini CLI when working on the `codeceus` project. These instructions take precedence over general defaults.
 
 ## Project Overview
 - **Framework**: SvelteKit (Svelte 5)

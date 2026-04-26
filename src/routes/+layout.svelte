@@ -22,7 +22,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>Racury Online Judge</title>
+	<title>Codeceus Online Judge</title>
 </svelte:head>
 
 <div class="flex min-h-screen flex-col bg-background font-sans antialiased">
@@ -34,7 +34,7 @@
 			<div class="flex items-center gap-6">
 				<a href="/" class="flex items-center space-x-2">
 					<Code2 class="h-6 w-6 text-primary" />
-					<span class="inline-block text-xl font-bold tracking-tight">Racury OJ</span>
+					<span class="inline-block text-xl font-bold tracking-tight">Codeceus</span>
 				</a>
 
 				<nav class="hidden items-center space-x-1 text-sm font-medium md:flex">
@@ -111,7 +111,7 @@
 	<!-- Footer -->
 	<footer class="border-t bg-muted/30 py-8">
 		<div class="container mx-auto px-4 text-center text-sm text-muted-foreground">
-			<p>© 2024 Racury Online Judge. All rights reserved.</p>
+			<p>© 2026 Codeceus Online Judge. All rights reserved.</p>
 		</div>
 	</footer>
 </div>

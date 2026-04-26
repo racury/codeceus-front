@@ -19,7 +19,7 @@
 				</div>
 			</div>
 			<Card.Title class="text-3xl font-bold tracking-tight">로그인</Card.Title>
-			<Card.Description>Racury OJ에 오신 것을 환영합니다</Card.Description>
+			<Card.Description>Codeceus에 오신 것을 환영합니다</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-6 pt-4">
 			{#if form?.message}
