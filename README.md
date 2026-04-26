@@ -1,6 +1,7 @@
 # Frontend for Online Judge Platform
 
 ```
-docker compose up -d
-npm run dev
+pnpm db:start
+pnpm db:push
+pnpm run dev
 ```
