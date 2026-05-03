@@ -1,6 +1,6 @@
-# Gemini CLI Project Instructions - codeceus
+# Gemini CLI Project Instructions - codeceus (Frontend)
 
-This file contains foundational mandates for the Gemini CLI when working on the `codeceus` project. These instructions take precedence over general defaults.
+This file contains foundational mandates for the Gemini CLI when working on the `codeceus` frontend project. These instructions take precedence over general defaults.
 
 ## Project Overview
 - **Framework**: SvelteKit (Svelte 5)
@@ -12,6 +12,7 @@ This file contains foundational mandates for the Gemini CLI when working on the 
 - **UI Components**: shadcn-svelte (bits-ui)
 - **Forms**: sveltekit-superforms & formsnap
 - **Infrastructure**: Docker Compose (`compose.yaml`)
+- **Backend Integration**: Connects to the `codeceus` Rust backend via `src/lib/server/codeceus.ts`.
 
 ## Engineering Standards
 - **Svelte 5**: Use Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`, etc.) instead of Svelte 4 legacy syntax.
@@ -41,7 +42,7 @@ This file contains foundational mandates for the Gemini CLI when working on the 
 - **Auth Schema Sync**: `pnpm auth:schema` (Generates Better Auth schema)
 
 ## Contextual Guidance
-- When modifying or creating Svelte components, ensure they align with Svelte 5 paradigms.
-- Always check `src/lib/server/db/schema.ts` and `src/lib/server/db/auth.schema.ts` before performing database operations.
-- Reference `src/lib/server/auth.ts` for authentication logic.
-- Use the `auth:schema` command after updating `auth.ts` to keep the database schema in sync.
+- **Backend Communication**: Use the `codeceus` utility in `src/lib/server/codeceus.ts` to interact with the code execution backend. Ensure `CODECEUS_URL` and `CODECEUS_TOKEN` are configured in `.env`.
+- **Runes Usage**: Always prefer runes for state management. Avoid `$:` reactive declarations.
+- **Database Schemas**: Always check `src/lib/server/db/schema.ts` and `src/lib/server/db/auth.schema.ts` before performing database operations.
+- **Auth Logic**: Reference `src/lib/server/auth.ts` for authentication logic. Use the `auth:schema` command after updating `auth.ts` to keep the database schema in sync.

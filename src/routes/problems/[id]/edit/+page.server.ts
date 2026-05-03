@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db';
 import * as schema from '$lib/server/db/schema';
+import { recalculateUserRating } from '$lib/server/rating';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
@@ -97,6 +98,19 @@ export const actions: Actions = {
 			await db.update(schema.problems)
 				.set(updateData)
 				.where(eq(schema.problems.id, id));
+
+			// If difficulty changed, recalculate all solvers' ratings
+			if (locals.user.role === 'admin' && difficultyRating !== existingProblem.difficultyRating) {
+				const solvers = await db.query.solvedProblems.findMany({
+					where: eq(schema.solvedProblems.problemId, id)
+				});
+				
+				// Run in background/parallel to avoid blocking the UI too long
+				// but for small scale this is fine. 
+				for (const s of solvers) {
+					await recalculateUserRating(s.userId);
+				}
+			}
 
 			await db.delete(schema.problemsToCategories).where(eq(schema.problemsToCategories.problemId, id));
 			if (categoryIds.length > 0) {

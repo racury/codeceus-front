@@ -78,6 +78,20 @@ export const codeceus = {
 			body: JSON.stringify(body)
 		}),
 
+	createBatchSubmissions: (submissions: {
+		language_id: number;
+		source_code: string;
+		stdin?: string;
+		expected_output?: string;
+		cpu_time_limit_ms?: number;
+		wall_time_limit_ms?: number;
+		memory_limit_kb?: number;
+	}[]) =>
+		call<{ token: string }[]>('/submissions/batch?wait=false', {
+			method: 'POST',
+			body: JSON.stringify({ submissions })
+		}),
+
 	getSubmission: (token: string) => call<Submission>(`/submissions/${token}`),
 
 	baseUrl: () => BASE

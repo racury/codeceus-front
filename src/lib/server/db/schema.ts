@@ -108,7 +108,7 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-export const submissions = pgTable('submissions', {
+export const problemSubmissions = pgTable('problem_submissions', {
 	id: serial('id').primaryKey(),
 	problemId: integer('problem_id')
 		.notNull()
@@ -119,9 +119,37 @@ export const submissions = pgTable('submissions', {
 	language: text('language').notNull(),
 	code: text('code').notNull(),
 	status: text('status').notNull().default('pending'),
+	statusId: integer('status_id').notNull().default(1),
 	runtime: integer('runtime'),
 	memory: integer('memory'),
-	createdAt: timestamp('created_at').defaultNow().notNull()
+	createdAt: timestamp('created_at').defaultNow().notNull(),
+	finishedAt: timestamp('finished_at')
+});
+
+export const submissions = pgTable('submissions', {
+	id: serial('id').primaryKey(),
+	problemId: integer('problem_id')
+		.notNull()
+		.references(() => problems.id, { onDelete: 'cascade' }),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	problemSubmissionId: integer('problem_submission_id')
+		.references(() => problemSubmissions.id, { onDelete: 'cascade' }),
+	token: text('token').notNull().unique(),
+	testcaseIndex: integer('testcase_index'),
+	language: text('language').notNull(),
+	code: text('code').notNull(),
+	status: text('status').notNull().default('pending'),
+	statusId: integer('status_id').notNull().default(1),
+	runtime: integer('runtime'),
+	memory: integer('memory'),
+	stdout: text('stdout'),
+	stderr: text('stderr'),
+	compileOutput: text('compile_output'),
+	message: text('message'),
+	createdAt: timestamp('created_at').defaultNow().notNull(),
+	finishedAt: timestamp('finished_at')
 });
 
 export const testcases = pgTable('testcases', {
@@ -134,6 +162,18 @@ export const testcases = pgTable('testcases', {
 	isPublic: boolean('is_public').default(false).notNull(),
 	createdAt: timestamp('created_at').defaultNow().notNull()
 });
+
+export const solvedProblems = pgTable('solved_problems', {
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	problemId: integer('problem_id')
+		.notNull()
+		.references(() => problems.id, { onDelete: 'cascade' }),
+	solvedAt: timestamp('solved_at').defaultNow().notNull()
+}, (t) => [
+	primaryKey({ columns: [t.userId, t.problemId] })
+]);
 
 export const problemsets = pgTable('problemsets', {
 	id: serial('id').primaryKey(),
@@ -198,6 +238,8 @@ export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   submissions: many(submissions),
+  problemSubmissions: many(problemSubmissions),
+  solvedProblems: many(solvedProblems),
   problemsets: many(problemsets),
   roadmaps: many(roadmaps),
 }));
@@ -205,8 +247,21 @@ export const userRelations = relations(user, ({ many }) => ({
 export const problemsRelations = relations(problems, ({ many }) => ({
 	categories: many(problemsToCategories),
 	submissions: many(submissions),
+	problemSubmissions: many(problemSubmissions),
 	testcases: many(testcases),
 	problemsets: many(problemsetProblems)
+}));
+
+export const problemSubmissionsRelations = relations(problemSubmissions, ({ one, many }) => ({
+	user: one(user, {
+		fields: [problemSubmissions.userId],
+		references: [user.id]
+	}),
+	problem: one(problems, {
+		fields: [problemSubmissions.problemId],
+		references: [problems.id]
+	}),
+	testcaseSubmissions: many(submissions)
 }));
 
 export const problemsetsRelations = relations(problemsets, ({ one, many }) => ({
@@ -273,6 +328,21 @@ export const submissionRelations = relations(submissions, ({ one }) => ({
 		fields: [submissions.problemId],
 		references: [problems.id],
 	}),
+	problemSubmission: one(problemSubmissions, {
+		fields: [submissions.problemSubmissionId],
+		references: [problemSubmissions.id]
+	})
+}));
+
+export const solvedProblemsRelations = relations(solvedProblems, ({ one }) => ({
+	user: one(user, {
+		fields: [solvedProblems.userId],
+		references: [user.id]
+	}),
+	problem: one(problems, {
+		fields: [solvedProblems.problemId],
+		references: [problems.id]
+	})
 }));
 
 export const roadmapsRelations = relations(roadmaps, ({ one, many }) => ({
@@ -306,7 +376,7 @@ export const roadmapEdgesRelations = relations(roadmapEdges, ({ one }) => ({
 		relationName: 'outgoingEdges'
 	}),
 	target: one(roadmapNodes, {
-		fields: [roadmapEdges.targetId],
+		fields: [roadmapEdges.sourceId],
 		references: [roadmapNodes.id],
 		relationName: 'incomingEdges'
 	})
