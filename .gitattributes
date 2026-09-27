@@ -1,0 +1,3 @@
+# Keep LF in the working tree too (prettier's endOfLine is "lf"); without this,
+# core.autocrlf=true on Windows checks files out as CRLF and `pnpm lint` fails.
+* text=auto eol=lf
