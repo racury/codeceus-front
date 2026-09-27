@@ -6,7 +6,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Badge } from '$lib/components/ui/badge';
-	import { ChevronLeft, Save, Trophy, Calendar, ListTodo, Search, X, Plus } from '@lucide/svelte';
+	import { ChevronLeft, Trophy, Calendar, ListTodo, Search, X, Plus } from '@lucide/svelte';
 
 	let { data, form } = $props();
 	let isSubmitting = $state(false);
@@ -116,7 +116,7 @@
 								>선택된 문제</Label
 							>
 							<div class="flex flex-wrap gap-2 rounded-lg border bg-primary/5 p-3">
-								{#each selectedProblems as p}
+								{#each selectedProblems as p (p.id)}
 									<input type="hidden" name="problems" value={p.id} />
 									<Badge variant="default" class="flex items-center gap-1 py-1 pr-1 pl-2">
 										<span class="font-mono text-[10px] opacity-70">#{p.id}</span>
@@ -142,7 +142,7 @@
 						<div
 							class="grid max-h-[350px] grid-cols-1 gap-2 overflow-y-auto rounded-md border bg-muted/20 p-1"
 						>
-							{#each filteredProblems as problem}
+							{#each filteredProblems as problem (problem.id)}
 								<button
 									type="button"
 									onclick={() => toggleProblem(problem.id)}

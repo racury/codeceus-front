@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
@@ -64,9 +65,9 @@
 			</div>
 		{:else}
 			<div class="grid gap-3">
-				{#each problemset.problems as pp, i}
+				{#each problemset.problems as pp, i (pp.problemId)}
 					{@const p = pp.problem}
-					<a href={`/problems/${p.id}`} class="group block">
+					<a href={resolve('/problems/[id]', { id: String(p.id) })} class="group block">
 						<Card.Root class="transition-colors hover:border-primary/50 hover:bg-muted/30">
 							<Card.Content class="flex items-center justify-between gap-4 p-4 sm:p-2">
 								<div class="flex min-w-0 items-center gap-4 sm:gap-6">

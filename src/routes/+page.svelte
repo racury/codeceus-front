@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
-	import { Code2, Trophy, ArrowRight, Star, Zap } from '@lucide/svelte';
+	import { Trophy, ArrowRight, Star, Zap } from '@lucide/svelte';
 
 	let { data } = $props();
 	const featuredProblems = $derived(data.featuredProblems);
@@ -68,8 +69,8 @@
 					<Button variant="link" href="/problems" class="text-primary">모든 문제 보기</Button>
 				</div>
 				<div class="grid gap-4">
-					{#each featuredProblems as problem}
-						<a href={`/problems/${problem.id}`} class="block">
+					{#each featuredProblems as problem (problem.id)}
+						<a href={resolve('/problems/[id]', { id: String(problem.id) })} class="block">
 							<Card.Root class="group transition-all hover:border-primary">
 								<Card.Content class="flex items-center justify-between p-4">
 									<div class="flex items-center gap-4">
@@ -109,7 +110,7 @@
 			<div class="flex flex-col gap-6">
 				<h2 class="text-3xl font-bold tracking-tight">예정된 대회</h2>
 				<div class="grid gap-4">
-					{#each upcomingContests as contest}
+					{#each upcomingContests as contest (contest.id)}
 						<Card.Root class="border-primary/20 bg-primary/5">
 							<Card.Header class="p-5 pb-2">
 								<Card.Title class="text-lg">{contest.title}</Card.Title>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { enhance } from '$app/forms';
 	import * as Card from '$lib/components/ui/card';
 	import * as Tabs from '$lib/components/ui/tabs';
@@ -7,7 +8,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
 	import * as Select from '$lib/components/ui/select';
-	import { ChevronLeft, Info, FileText, Layers, AlertCircle, Trash2, Plus } from '@lucide/svelte';
+	import { ChevronLeft, FileText, AlertCircle, Trash2, Plus } from '@lucide/svelte';
 	import { getTier } from '$lib/utils';
 
 	let { data, form } = $props();
@@ -114,7 +115,7 @@
 									{/if}
 								</Select.Trigger>
 								<Select.Content class="max-h-80">
-									{#each allProblems as p}
+									{#each allProblems as p (p.id)}
 										<Select.Item value={p.id.toString()} label={`${p.id}. ${p.title}`}>
 											<span class="mr-2 inline-block w-6 text-muted-foreground">{p.id}</span>
 											{p.title}
@@ -145,13 +146,13 @@
 						</div>
 					{:else}
 						<div class="divide-y rounded-md border">
-							{#each problemset.problems as pp, i}
+							{#each problemset.problems as pp, i (pp.problemId)}
 								<div class="flex items-center justify-between p-4 hover:bg-muted/50">
 									<div class="flex items-center gap-4">
 										<span class="w-6 text-lg font-bold text-muted-foreground">{i + 1}</span>
 										<div>
 											<a
-												href={`/problems/${pp.problem.id}`}
+												href={resolve('/problems/[id]', { id: String(pp.problem.id) })}
 												target="_blank"
 												class="font-bold hover:underline"
 											>

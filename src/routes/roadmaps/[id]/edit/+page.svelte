@@ -2,8 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { Button } from '$lib/components/ui/button';
 	import * as Select from '$lib/components/ui/select';
-	import { Label } from '$lib/components/ui/label';
-	import { ChevronLeft, Save, Plus, Trash2, Link } from '@lucide/svelte';
+	import { ChevronLeft, Save, Plus, Trash2 } from '@lucide/svelte';
 	import { untrack } from 'svelte';
 	import '@xyflow/svelte/dist/style.css';
 	import {
@@ -11,14 +10,12 @@
 		Background,
 		Controls,
 		MiniMap,
-		useSvelteFlow,
 		type Node,
 		type Edge,
 		type Connection,
 		addEdge,
 		BackgroundVariant
 	} from '@xyflow/svelte';
-	import { writable } from 'svelte/store';
 	import RoadmapNode from '../RoadmapNode.svelte';
 
 	let { data, form } = $props();
@@ -119,7 +116,7 @@
 								: '추가할 문제집 선택'}
 						</Select.Trigger>
 						<Select.Content class="max-h-60">
-							{#each allProblemsets as ps}
+							{#each allProblemsets as ps (ps.id)}
 								<Select.Item value={ps.id.toString()} label={ps.title} class="text-xs">
 									{ps.title}
 								</Select.Item>

@@ -1,12 +1,12 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { enhance } from '$app/forms';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
-	import { Trophy, Calendar, Users, Timer, ChevronLeft, Lock, ArrowRight } from '@lucide/svelte';
-	import { getTier, cn } from '$lib/utils';
+	import { Trophy, Users, Timer, ChevronLeft, Lock, ArrowRight } from '@lucide/svelte';
 
-	let { data, form } = $props();
+	let { data } = $props();
 	const competition = $derived(data.competition);
 	const isParticipant = $derived(data.isParticipant);
 	const user = $derived(data.user);
@@ -88,9 +88,9 @@
 					</Card.Root>
 				{:else}
 					<div class="grid gap-3">
-						{#each competition.problems as cp, i}
+						{#each competition.problems as cp, i (cp.problemId)}
 							{@const p = cp.problem}
-							<a href={`/problems/${p.id}`} class="group">
+							<a href={resolve('/problems/[id]', { id: String(p.id) })} class="group">
 								<Card.Root class="transition-all hover:border-primary/50 hover:bg-muted/30">
 									<Card.Content class="flex items-center justify-between p-4">
 										<div class="flex items-center gap-4">

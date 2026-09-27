@@ -1,6 +1,5 @@
 import { db } from '$lib/server/db';
 import { competitions, competitionProblems } from '$lib/server/db/schema';
-import * as schema from '$lib/server/db/schema';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

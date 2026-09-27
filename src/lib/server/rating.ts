@@ -1,6 +1,6 @@
 import { db } from './db';
-import { user, solvedProblems, problems } from './db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { user, solvedProblems } from './db/schema';
+import { eq } from 'drizzle-orm';
 
 /**
  * Recalculates the rating for a specific user based on all their solved problems.

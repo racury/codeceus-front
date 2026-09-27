@@ -1,12 +1,12 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { Button } from '$lib/components/ui/button';
-	import * as NavigationMenu from '$lib/components/ui/navigation-menu';
 	import { Input } from '$lib/components/ui/input';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { Separator } from '$lib/components/ui/separator';
-	import { Search, Trophy, Code2, Layers, BarChart3, Bell, User, Map } from '@lucide/svelte';
+	import { Search, Trophy, Code2, Layers, BarChart3, User, Map } from '@lucide/svelte';
 
 	let { data, children } = $props();
 	const user = $derived(data.user);
@@ -32,13 +32,13 @@
 	>
 		<div class="container mx-auto flex h-16 items-center justify-between px-4">
 			<div class="flex items-center gap-6">
-				<a href="/" class="flex items-center space-x-2">
+				<a href={resolve('/')} class="flex items-center space-x-2">
 					<Code2 class="h-6 w-6 text-primary" />
 					<span class="inline-block text-xl font-bold tracking-tight">Codeceus</span>
 				</a>
 
 				<nav class="hidden items-center space-x-1 text-sm font-medium md:flex">
-					{#each navItems as item}
+					{#each navItems as item (item.href)}
 						<Button variant="ghost" href={item.href} class="flex items-center gap-2">
 							<item.icon class="h-4 w-4" />
 							{item.name}
@@ -65,7 +65,7 @@
 						<div class="flex items-center gap-3 pl-2">
 							<div class="hidden flex-col items-end sm:flex">
 								<a
-									href={`/profile/${user.id}`}
+									href={resolve('/profile/[id]', { id: user.id })}
 									class="text-sm leading-none font-medium transition-colors hover:text-primary"
 									>{user.name}</a
 								>
@@ -86,7 +86,7 @@
 						</div>
 					{:else}
 						<a
-							href="/signin"
+							href={resolve('/signin')}
 							class="flex items-center gap-3 pl-2 transition-opacity hover:opacity-80"
 						>
 							<div class="hidden flex-col items-end sm:flex">

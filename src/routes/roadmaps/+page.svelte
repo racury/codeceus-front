@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
@@ -23,7 +24,7 @@
 	</div>
 
 	<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-		{#each data.roadmaps as roadmap}
+		{#each data.roadmaps as roadmap (roadmap.id)}
 			<Card.Root class="flex h-full flex-col transition-colors hover:bg-muted/50">
 				<Card.Header>
 					<div class="mb-2 flex items-center justify-between">
@@ -32,7 +33,7 @@
 						</Badge>
 					</div>
 					<Card.Title class="line-clamp-2 leading-tight">
-						<a href={`/roadmaps/${roadmap.id}`} class="hover:underline">
+						<a href={resolve('/roadmaps/[id]', { id: String(roadmap.id) })} class="hover:underline">
 							{roadmap.title}
 						</a>
 					</Card.Title>

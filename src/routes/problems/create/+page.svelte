@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import * as Card from '$lib/components/ui/card';
@@ -8,7 +9,6 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Badge } from '$lib/components/ui/badge';
 	import { ChevronLeft, Info, Settings2, FileText, Code2, Layers } from '@lucide/svelte';
-	import { cn } from '$lib/utils';
 
 	let { data, form } = $props();
 
@@ -16,7 +16,7 @@
 
 	$effect(() => {
 		if (form?.success) {
-			goto(`/problems/${form.problemId}`);
+			goto(resolve('/problems/[id]', { id: String(form.problemId) }));
 		}
 	});
 </script>
@@ -178,7 +178,7 @@
 				</Card.Header>
 				<Card.Content>
 					<div class="grid grid-cols-2 gap-3">
-						{#each data.categories as category}
+						{#each data.categories as category (category.id)}
 							<label
 								class="flex cursor-pointer items-center gap-2 rounded-md border border-transparent p-2 transition-colors hover:border-border hover:bg-muted"
 							>

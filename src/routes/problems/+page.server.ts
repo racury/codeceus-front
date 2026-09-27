@@ -1,5 +1,4 @@
 import { db } from '$lib/server/db';
-import { problems, categories } from '$lib/server/db/schema';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {

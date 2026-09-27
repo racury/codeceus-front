@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import * as Table from '$lib/components/ui/table';
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
 	import { Badge } from '$lib/components/ui/badge';
 	import { getTier, cn } from '$lib/utils';
-	import { Trophy, Medal, Star } from '@lucide/svelte';
+	import { Trophy, Medal } from '@lucide/svelte';
 
 	let { data } = $props();
 	const users = $derived(data.topUsers);
@@ -27,11 +28,11 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each users as user, i}
+					{#each users as user, i (user.id)}
 						{@const tier = getTier(user.rating)}
 						<Table.Row>
 							<Table.Cell class="text-center font-bold">
-								<a href={`/profile/${user.id}`} class="block h-full w-full">
+								<a href={resolve('/profile/[id]', { id: user.id })} class="block h-full w-full">
 									{#if i === 0}
 										<Trophy class="mx-auto h-5 w-5 text-yellow-500" />
 									{:else if i === 1}
@@ -49,7 +50,10 @@
 										<AvatarImage src={user.image} alt={user.name} />
 										<AvatarFallback>{user.name[0]}</AvatarFallback>
 									</Avatar>
-									<a href={`/profile/${user.id}`} class="font-medium hover:underline">
+									<a
+										href={resolve('/profile/[id]', { id: user.id })}
+										class="font-medium hover:underline"
+									>
 										{user.name}
 									</a>
 								</div>

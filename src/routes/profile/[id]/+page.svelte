@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { getTier, cn } from '$lib/utils';
-	import { Settings, Calendar, Award, Code2, CheckCircle2, History } from '@lucide/svelte';
+	import { Settings, Calendar, Code2, CheckCircle2, History } from '@lucide/svelte';
 
 	let { data } = $props();
 	const user = $derived(data.profileUser);
@@ -79,7 +80,7 @@
 				</Card.Root>
 			{:else}
 				<div class="flex flex-col gap-3">
-					{#each data.recentSubmissions as sub}
+					{#each data.recentSubmissions as sub (sub.id)}
 						<Card.Root>
 							<Card.Content class="flex items-center justify-between p-4">
 								<div class="flex items-center gap-4">
@@ -98,7 +99,10 @@
 										{/if}
 									</div>
 									<div>
-										<a href={`/problems/${sub.problem.id}`} class="font-bold hover:underline">
+										<a
+											href={resolve('/problems/[id]', { id: String(sub.problem.id) })}
+											class="font-bold hover:underline"
+										>
 											{sub.problem.id}. {sub.problem.title}
 										</a>
 										<p class="text-xs text-muted-foreground">

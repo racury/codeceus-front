@@ -133,7 +133,7 @@ export const actions: Actions = {
 				passwordError: true,
 				action: 'changePassword'
 			};
-		} catch (e: any) {
+		} catch {
 			return fail(400, {
 				message: '비밀번호 변경 중 오류가 발생했습니다. 현재 비밀번호를 확인해주세요.',
 				passwordError: true,

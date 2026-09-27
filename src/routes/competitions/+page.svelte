@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
@@ -34,7 +35,7 @@
 	</div>
 
 	<div class="grid gap-6">
-		{#each data.competitions as comp}
+		{#each data.competitions as comp (comp.id)}
 			{@const status = getStatus(new Date(comp.startTime), new Date(comp.endTime))}
 			<Card.Root class="overflow-hidden transition-all hover:border-primary/30">
 				<div class="flex flex-col md:flex-row">
@@ -52,7 +53,10 @@
 						</div>
 
 						<Card.Title class="mb-2 text-2xl">
-							<a href={`/competitions/${comp.id}`} class="hover:underline">
+							<a
+								href={resolve('/competitions/[id]', { id: String(comp.id) })}
+								class="hover:underline"
+							>
 								{comp.title}
 							</a>
 						</Card.Title>

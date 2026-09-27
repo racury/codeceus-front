@@ -7,7 +7,7 @@ import {
 	problemsToCategories,
 	categories
 } from '$lib/server/db/schema';
-import { eq, and, notInArray, sql, gt, desc, asc } from 'drizzle-orm';
+import { eq, and, notInArray, sql, gt, asc } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
