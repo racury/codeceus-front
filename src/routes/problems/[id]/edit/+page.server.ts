@@ -78,7 +78,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			const updateData: any = {
+			const updateData: Partial<typeof schema.problems.$inferInsert> = {
 				title,
 				description,
 				inputFormat,
@@ -146,11 +146,8 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const inputs = formData.getAll('testcaseInput');
 		const outputs = formData.getAll('testcaseOutput');
-		const isPublics = formData.getAll('testcaseIsPublic'); // values will be "on" or index
 
 		try {
-			await db.delete(schema.testcases).where(eq(schema.testcases.problemId, problemId));
-
 			const testcaseData = inputs
 				.map((input, i) => ({
 					problemId,
@@ -160,9 +157,13 @@ export const actions: Actions = {
 				}))
 				.filter((tc) => tc.input.trim() || tc.output.trim());
 
-			if (testcaseData.length > 0) {
-				await db.insert(schema.testcases).values(testcaseData);
-			}
+			// Replace the whole set atomically so a failed insert can't leave the problem without testcases.
+			await db.transaction(async (tx) => {
+				await tx.delete(schema.testcases).where(eq(schema.testcases.problemId, problemId));
+				if (testcaseData.length > 0) {
+					await tx.insert(schema.testcases).values(testcaseData);
+				}
+			});
 
 			return { success: true };
 		} catch (err) {

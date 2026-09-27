@@ -4,6 +4,10 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 
+// Shape of the SvelteFlow graph the editor posts as JSON.
+type GraphNode = { id: string; position: { x: number; y: number }; data: { problemsetId: number } };
+type GraphEdge = { id: string; source: string; target: string };
+
 export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!locals.user) {
 		throw redirect(302, '/signin');
@@ -60,35 +64,38 @@ export const actions: Actions = {
 		if (!graphDataStr) return fail(400, { message: 'No graph data provided' });
 
 		try {
-			const { nodes, edges } = JSON.parse(graphDataStr);
+			const { nodes = [], edges = [] } = JSON.parse(graphDataStr) as {
+				nodes?: GraphNode[];
+				edges?: GraphEdge[];
+			};
 
-			// Delete existing nodes and edges (edges will be deleted via cascade or we can delete them first)
-			await db.delete(schema.roadmapNodes).where(eq(schema.roadmapNodes.roadmapId, roadmapId));
+			// Replace the whole graph atomically; edges cascade with their nodes.
+			await db.transaction(async (tx) => {
+				await tx.delete(schema.roadmapNodes).where(eq(schema.roadmapNodes.roadmapId, roadmapId));
 
-			// Insert new nodes
-			if (nodes && nodes.length > 0) {
-				await db.insert(schema.roadmapNodes).values(
-					nodes.map((n: any) => ({
-						id: n.id,
-						roadmapId,
-						problemsetId: n.data.problemsetId,
-						positionX: Math.round(n.position.x),
-						positionY: Math.round(n.position.y)
-					}))
-				);
-			}
+				if (nodes.length > 0) {
+					await tx.insert(schema.roadmapNodes).values(
+						nodes.map((n) => ({
+							id: n.id,
+							roadmapId,
+							problemsetId: n.data.problemsetId,
+							positionX: Math.round(n.position.x),
+							positionY: Math.round(n.position.y)
+						}))
+					);
+				}
 
-			// Insert new edges
-			if (edges && edges.length > 0) {
-				await db.insert(schema.roadmapEdges).values(
-					edges.map((e: any) => ({
-						id: e.id,
-						roadmapId,
-						sourceId: e.source,
-						targetId: e.target
-					}))
-				);
-			}
+				if (edges.length > 0) {
+					await tx.insert(schema.roadmapEdges).values(
+						edges.map((e) => ({
+							id: e.id,
+							roadmapId,
+							sourceId: e.source,
+							targetId: e.target
+						}))
+					);
+				}
+			});
 
 			return { success: true };
 		} catch (err) {
