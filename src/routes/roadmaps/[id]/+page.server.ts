@@ -27,13 +27,14 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	if (!roadmap) throw error(404, 'Roadmap not found');
 
-	let solvedProblemIds = new Set<number>();
+	// Only accepted solves count toward progress, not every attempt.
+	const solvedProblemIds = new Set<number>();
 	if (locals.user) {
-		const userSubmissions = await db.query.submissions.findMany({
-			where: eq(schema.submissions.userId, locals.user.id),
+		const solved = await db.query.solvedProblems.findMany({
+			where: eq(schema.solvedProblems.userId, locals.user.id),
 			columns: { problemId: true }
 		});
-		userSubmissions.forEach((sub) => solvedProblemIds.add(sub.problemId));
+		for (const s of solved) solvedProblemIds.add(s.problemId);
 	}
 
 	const nodeProgress: Record<

@@ -392,7 +392,7 @@ export const roadmapEdgesRelations = relations(roadmapEdges, ({ one }) => ({
 		relationName: 'outgoingEdges'
 	}),
 	target: one(roadmapNodes, {
-		fields: [roadmapEdges.sourceId],
+		fields: [roadmapEdges.targetId],
 		references: [roadmapNodes.id],
 		relationName: 'incomingEdges'
 	})
