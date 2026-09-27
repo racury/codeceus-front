@@ -35,13 +35,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		console.error('codeceus.listLanguages failed:', languagesError);
 	}
 
-	let userSubmissions: any[] = [];
-	if (locals.user) {
-		userSubmissions = await db.query.problemSubmissions.findMany({
-			where: and(
-				eq(problemSubmissions.problemId, id),
-				eq(problemSubmissions.userId, locals.user.id)
-			),
+	const loadUserSubmissions = (userId: string) =>
+		db.query.problemSubmissions.findMany({
+			where: and(eq(problemSubmissions.problemId, id), eq(problemSubmissions.userId, userId)),
 			with: {
 				testcaseSubmissions: {
 					orderBy: (s, { asc }) => [asc(s.testcaseIndex)]
@@ -49,7 +45,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			},
 			orderBy: [desc(problemSubmissions.createdAt)]
 		});
-	}
+	const userSubmissions: Awaited<ReturnType<typeof loadUserSubmissions>> = locals.user
+		? await loadUserSubmissions(locals.user.id)
+		: [];
 
 	return {
 		problem,

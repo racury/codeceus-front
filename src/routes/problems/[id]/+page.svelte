@@ -8,7 +8,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Select from '$lib/components/ui/select';
 	import { Label } from '$lib/components/ui/label';
-	import { Code2, Send, History, Info, ChevronLeft, Pencil, Loader2 } from '@lucide/svelte';
+	import { Send, History, Info, ChevronLeft, Pencil, Loader2 } from '@lucide/svelte';
 
 	import { getTier, cn } from '$lib/utils';
 
@@ -69,7 +69,7 @@
 	// Initialize results from history
 	$effect(() => {
 		if (userSubmissions && !initialized) {
-			results = userSubmissions.map((ps: any) => ({
+			results = userSubmissions.map((ps) => ({
 				id: ps.id,
 				status_id: ps.statusId,
 				status_label: ps.status,
@@ -78,7 +78,7 @@
 				runtime: ps.runtime,
 				memory: ps.memory,
 				createdAt: new Date(ps.createdAt),
-				testcases: ps.testcaseSubmissions.map((s: any) => ({
+				testcases: ps.testcaseSubmissions.map((s) => ({
 					token: s.token,
 					testcase_index: s.testcaseIndex,
 					status_id: s.statusId,
@@ -132,24 +132,14 @@
 
 	async function pollSubmission(token: string) {
 		for (let i = 0; i < 120; i++) {
-			let found = false;
-			let targetTR: TestCaseResult | null = null;
-			let targetPR: ProblemResult | null = null;
-
-			for (const pr of results) {
-				const tr = pr.testcases.find((t) => t.token === token);
-				if (tr) {
-					targetTR = tr;
-					targetPR = pr;
-					found = true;
-					break;
-				}
-			}
-
+			// Stop once the submission is no longer shown (e.g. after a refresh)
+			const found = results.some((pr) => pr.testcases.some((t) => t.token === token));
 			if (!found) return;
 
 			try {
 				const res = await fetch(`/api/submissions/${token}`);
+				// Signed out or not our submission: retrying can't succeed
+				if (res.status === 401 || res.status === 404) return;
 				if (!res.ok) throw new Error(`status ${res.status}`);
 				const sub = await res.json();
 				const done = sub.status_id !== 1 && sub.status_id !== 2;
@@ -207,8 +197,6 @@
 
 	$effect(() => {
 		if (form && 'success' in form && form.success && form.results) {
-			const formResults = form.results as { token: string; testcase_index: number | null }[];
-
 			// We need the ID of the new problem submission, which is not in form.results
 			// Simplest way: refresh from server to get the full structure
 			refreshResults();
@@ -292,7 +280,7 @@
 				</section>
 
 				<section class="grid gap-8 md:grid-cols-1">
-					{#each problem.testcases as tc, i}
+					{#each problem.testcases as tc, i (tc.id)}
 						<div class="grid gap-4 md:grid-cols-2">
 							<div>
 								<h3 class="mb-3 text-lg font-bold">예제 입력 {i + 1}</h3>
@@ -357,7 +345,7 @@
 										{selectedLanguageLabel}
 									</Select.Trigger>
 									<Select.Content>
-										{#each languages as lang}
+										{#each languages as lang (lang.id)}
 											<Select.Item value={String(lang.id)} label={lang.name}>
 												{lang.name}
 											</Select.Item>
@@ -461,7 +449,7 @@
 								</Card.Header>
 								<Card.Content>
 									<div class="grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
-										{#each pr.testcases as tr}
+										{#each pr.testcases as tr (tr.token)}
 											<div
 												class={cn(
 													'flex flex-col items-center justify-center rounded-md border p-2 text-center transition-all',
@@ -497,7 +485,7 @@
 										<div class="mt-4 space-y-3">
 											{#each pr.testcases
 												.filter((t) => t.status_id !== 3 && t.status_id > 2)
-												.slice(0, 1) as errorTr}
+												.slice(0, 1) as errorTr (errorTr.token)}
 												<div class="rounded-lg bg-slate-950 p-4 font-mono text-xs text-slate-50">
 													<div
 														class="mb-2 flex items-center justify-between border-b border-slate-800 pb-2"

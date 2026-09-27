@@ -1,15 +1,9 @@
 import { db } from '$lib/server/db';
-import {
-	submissions,
-	problemSubmissions,
-	solvedProblems,
-	user,
-	problems
-} from '$lib/server/db/schema';
+import { submissions, problemSubmissions, solvedProblems, problems } from '$lib/server/db/schema';
 import { codeceus } from '$lib/server/codeceus';
 import { recalculateUserRating } from '$lib/server/rating';
 import { json } from '@sveltejs/kit';
-import { eq, sql, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 const STATUS_LABELS: Record<number, string> = {
@@ -30,13 +24,25 @@ const STATUS_LABELS: Record<number, string> = {
 	15: 'Memory Limit Exceeded'
 };
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
 	const { token } = params;
 
+	if (!locals.user) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	// Only the owner may poll a submission. Unknown and foreign tokens get the
+	// same 404 so tokens can't be probed.
+	const owned = await db.query.submissions.findFirst({
+		where: eq(submissions.token, token),
+		columns: { userId: true }
+	});
+	if (!owned || owned.userId !== locals.user.id) {
+		return json({ error: 'Not found' }, { status: 404 });
+	}
+
 	try {
-		console.log(`Polling codeceus for token: ${token}`);
 		const sub = await codeceus.getSubmission(token);
-		console.log(`Codeceus returned status ${sub.status_id} for token ${token}`);
 
 		// Update individual submission
 		const done = sub.status_id !== 1 && sub.status_id !== 2;
@@ -91,40 +97,44 @@ export const GET: RequestHandler = async ({ params }) => {
 					.where(eq(problemSubmissions.id, psId))
 					.returning();
 
-				// If successfully solved, mark it and give points
+				// If successfully solved, mark it and give points. Concurrent polls
+				// can both get here, so the insert itself decides who records the
+				// solve; the rating is recalculated only after the row is committed,
+				// because recalculateUserRating reads through its own connection.
 				if (finalStatusId === 3) {
-					await db.transaction(async (tx) => {
-						// Check if already solved
-						const existingSolved = await tx.query.solvedProblems.findFirst({
-							where: and(
-								eq(solvedProblems.userId, updatedPs.userId),
-								eq(solvedProblems.problemId, updatedPs.problemId)
-							)
+					const inserted = await db
+						.insert(solvedProblems)
+						.values({ userId: updatedPs.userId, problemId: updatedPs.problemId })
+						.onConflictDoNothing()
+						.returning();
+
+					if (inserted.length > 0) {
+						const problemData = await db.query.problems.findFirst({
+							where: eq(problems.id, updatedPs.problemId),
+							columns: { difficultyRating: true }
 						});
-
-						if (!existingSolved) {
-							await tx.insert(solvedProblems).values({
-								userId: updatedPs.userId,
-								problemId: updatedPs.problemId
-							});
-
-							// Get problem difficulty for rating increase
-							const problemData = await tx.query.problems.findFirst({
-								where: eq(problems.id, updatedPs.problemId)
-							});
-
-							if (problemData && problemData.difficultyRating) {
-								await recalculateUserRating(updatedPs.userId);
-							}
+						if (problemData?.difficultyRating) {
+							await recalculateUserRating(updatedPs.userId);
 						}
-					});
+					}
 				}
 			}
 		}
 
-		return json(sub);
+		// Return only what the problem page renders. The raw backend submission
+		// also carries the testcase's stdin and expected_output, which would leak
+		// hidden testcases.
+		return json({
+			status_id: sub.status_id,
+			stdout: sub.stdout,
+			stderr: sub.stderr,
+			compile_output: sub.compile_output,
+			message: sub.message,
+			time_ms: sub.time_ms,
+			memory_kb: sub.memory_kb
+		});
 	} catch (err) {
 		console.error(`Error syncing submission ${token}:`, err);
-		return json({ error: String(err) }, { status: 500 });
+		return json({ error: 'Failed to sync submission' }, { status: 500 });
 	}
 };
