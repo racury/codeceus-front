@@ -31,7 +31,7 @@
 						{@const tier = getTier(user.rating)}
 						<Table.Row>
 							<Table.Cell class="text-center font-bold">
-								<a href={`/profile/${user.id}`} class="block w-full h-full">
+								<a href={`/profile/${user.id}`} class="block h-full w-full">
 									{#if i === 0}
 										<Trophy class="mx-auto h-5 w-5 text-yellow-500" />
 									{:else if i === 1}

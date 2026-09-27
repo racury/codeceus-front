@@ -1,5 +1,11 @@
 import { db } from '$lib/server/db';
-import { submissions, problemSubmissions, solvedProblems, user, problems } from '$lib/server/db/schema';
+import {
+	submissions,
+	problemSubmissions,
+	solvedProblems,
+	user,
+	problems
+} from '$lib/server/db/schema';
 import { codeceus } from '$lib/server/codeceus';
 import { recalculateUserRating } from '$lib/server/rating';
 import { json } from '@sveltejs/kit';
@@ -34,7 +40,7 @@ export const GET: RequestHandler = async ({ params }) => {
 
 		// Update individual submission
 		const done = sub.status_id !== 1 && sub.status_id !== 2;
-		
+
 		const [updatedSub] = await db
 			.update(submissions)
 			.set({
@@ -54,18 +60,18 @@ export const GET: RequestHandler = async ({ params }) => {
 		// If this is part of a problem submission, update the parent status
 		if (updatedSub && updatedSub.problemSubmissionId && done) {
 			const psId = updatedSub.problemSubmissionId;
-			
+
 			// Check all testcases for this problem submission
 			const allSubs = await db.query.submissions.findMany({
 				where: eq(submissions.problemSubmissionId, psId)
 			});
 
-			const allDone = allSubs.every(s => s.statusId !== 1 && s.statusId !== 2);
+			const allDone = allSubs.every((s) => s.statusId !== 1 && s.statusId !== 2);
 			if (allDone) {
-				// Determine overall status: 
+				// Determine overall status:
 				// If any failed, overall is that failure (pick first non-accepted)
 				// If all Accepted, overall is Accepted
-				const failedSub = allSubs.find(s => s.statusId !== 3);
+				const failedSub = allSubs.find((s) => s.statusId !== 3);
 				const finalStatusId = failedSub ? failedSub.statusId : 3;
 				const finalStatus = failedSub ? failedSub.status : 'Accepted';
 

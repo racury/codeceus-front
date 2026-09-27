@@ -46,7 +46,7 @@
 				selectable: false
 			}));
 
-			const initialEdges: Edge[] = rm.edges.map(e => {
+			const initialEdges: Edge[] = rm.edges.map((e) => {
 				const isSourceCompleted = prog[e.sourceId]?.isCompleted ?? false;
 				return {
 					id: e.id,

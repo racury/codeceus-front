@@ -26,11 +26,14 @@ export const actions: Actions = {
 
 		let newId: number;
 		try {
-			const [newProblemset] = await db.insert(problemsets).values({
-				title,
-				description,
-				createdById: locals.user.id
-			}).returning();
+			const [newProblemset] = await db
+				.insert(problemsets)
+				.values({
+					title,
+					description,
+					createdById: locals.user.id
+				})
+				.returning();
 			newId = newProblemset.id;
 		} catch (err) {
 			console.error(err);

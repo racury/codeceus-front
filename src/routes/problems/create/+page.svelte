@@ -21,7 +21,7 @@
 	});
 </script>
 
-<div class="container mx-auto max-w-5xl py-10 px-4">
+<div class="container mx-auto max-w-5xl px-4 py-10">
 	<div class="mb-8 flex items-center gap-4">
 		<Button variant="ghost" size="icon" href="/problems">
 			<ChevronLeft class="h-4 w-4" />
@@ -121,12 +121,17 @@
 				<Card.Content class="space-y-6">
 					<div class="space-y-2">
 						<Label for="hint">힌트 (선택)</Label>
-						<Textarea id="hint" name="hint" placeholder="예: 두 정수는 32비트 정수형 범위 내에 있습니다." />
+						<Textarea
+							id="hint"
+							name="hint"
+							placeholder="예: 두 정수는 32비트 정수형 범위 내에 있습니다."
+						/>
 					</div>
-					<div class="p-4 bg-muted/50 rounded-lg border border-dashed flex items-center gap-3">
+					<div class="flex items-center gap-3 rounded-lg border border-dashed bg-muted/50 p-4">
 						<Info class="h-5 w-5 text-muted-foreground" />
 						<p class="text-xs text-muted-foreground">
-							<strong>참고:</strong> 채점 및 예제용 테스트케이스는 문제 생성 후 <strong>'문제 편집'</strong> 페이지에서 추가하실 수 있습니다.
+							<strong>참고:</strong> 채점 및 예제용 테스트케이스는 문제 생성 후
+							<strong>'문제 편집'</strong> 페이지에서 추가하실 수 있습니다.
 						</p>
 					</div>
 				</Card.Content>

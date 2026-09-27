@@ -69,7 +69,7 @@ export const actions: Actions = {
 		const timeLimit = formData.get('timeLimit') as string;
 		const memoryLimit = formData.get('memoryLimit') as string;
 		const categoryIds = formData.getAll('categories').map(Number);
-		
+
 		const difficultyRatingStr = formData.get('difficultyRating') as string;
 		const difficultyRating = difficultyRatingStr ? parseInt(difficultyRatingStr) : null;
 
@@ -95,27 +95,27 @@ export const actions: Actions = {
 				updateData.difficultyRating = difficultyRating;
 			}
 
-			await db.update(schema.problems)
-				.set(updateData)
-				.where(eq(schema.problems.id, id));
+			await db.update(schema.problems).set(updateData).where(eq(schema.problems.id, id));
 
 			// If difficulty changed, recalculate all solvers' ratings
 			if (locals.user.role === 'admin' && difficultyRating !== existingProblem.difficultyRating) {
 				const solvers = await db.query.solvedProblems.findMany({
 					where: eq(schema.solvedProblems.problemId, id)
 				});
-				
+
 				// Run in background/parallel to avoid blocking the UI too long
-				// but for small scale this is fine. 
+				// but for small scale this is fine.
 				for (const s of solvers) {
 					await recalculateUserRating(s.userId);
 				}
 			}
 
-			await db.delete(schema.problemsToCategories).where(eq(schema.problemsToCategories.problemId, id));
+			await db
+				.delete(schema.problemsToCategories)
+				.where(eq(schema.problemsToCategories.problemId, id));
 			if (categoryIds.length > 0) {
 				await db.insert(schema.problemsToCategories).values(
-					categoryIds.map(catId => ({
+					categoryIds.map((catId) => ({
 						problemId: id,
 						categoryId: catId
 					}))
@@ -150,13 +150,15 @@ export const actions: Actions = {
 
 		try {
 			await db.delete(schema.testcases).where(eq(schema.testcases.problemId, problemId));
-			
-			const testcaseData = inputs.map((input, i) => ({
-				problemId,
-				input: input as string,
-				output: outputs[i] as string,
-				isPublic: formData.get(`testcaseIsPublic_${i}`) === 'on'
-			})).filter(tc => tc.input.trim() || tc.output.trim());
+
+			const testcaseData = inputs
+				.map((input, i) => ({
+					problemId,
+					input: input as string,
+					output: outputs[i] as string,
+					isPublic: formData.get(`testcaseIsPublic_${i}`) === 'on'
+				}))
+				.filter((tc) => tc.input.trim() || tc.output.trim());
 
 			if (testcaseData.length > 0) {
 				await db.insert(schema.testcases).values(testcaseData);

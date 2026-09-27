@@ -1,5 +1,12 @@
 import { db } from '$lib/server/db';
-import { problems, submissions, competitions, competitionParticipants, problemsToCategories, categories } from '$lib/server/db/schema';
+import {
+	problems,
+	submissions,
+	competitions,
+	competitionParticipants,
+	problemsToCategories,
+	categories
+} from '$lib/server/db/schema';
 import { eq, and, notInArray, sql, gt, desc, asc } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
@@ -71,7 +78,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	return {
 		featuredProblems,
-		upcomingContests: upcomingContestsRaw.map(c => ({
+		upcomingContests: upcomingContestsRaw.map((c) => ({
 			id: c.id,
 			title: c.title,
 			date: c.startTime,

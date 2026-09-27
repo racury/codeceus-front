@@ -20,9 +20,7 @@
 	const languagesError = $derived(data.languagesError);
 	const userSubmissions = $derived(data.userSubmissions);
 
-	const isAuthorized = $derived(
-		user && (user.role === 'admin' || user.id === problem.createdById)
-	);
+	const isAuthorized = $derived(user && (user.role === 'admin' || user.id === problem.createdById));
 
 	let selectedLanguage = $state<string>('');
 	$effect(() => {
@@ -139,7 +137,7 @@
 			let targetPR: ProblemResult | null = null;
 
 			for (const pr of results) {
-				const tr = pr.testcases.find(t => t.token === token);
+				const tr = pr.testcases.find((t) => t.token === token);
 				if (tr) {
 					targetTR = tr;
 					targetPR = pr;
@@ -155,11 +153,11 @@
 				if (!res.ok) throw new Error(`status ${res.status}`);
 				const sub = await res.json();
 				const done = sub.status_id !== 1 && sub.status_id !== 2;
-				
+
 				// Update the nested state
 				for (let prIdx = 0; prIdx < results.length; prIdx++) {
 					const pr = results[prIdx];
-					const trIdx = pr.testcases.findIndex(t => t.token === token);
+					const trIdx = pr.testcases.findIndex((t) => t.token === token);
 					if (trIdx >= 0) {
 						// Update testcase
 						const tr = pr.testcases[trIdx];
@@ -177,16 +175,16 @@
 						};
 
 						// Recalculate parent status if all testcases are done
-						const allDone = pr.testcases.every(t => t.done);
+						const allDone = pr.testcases.every((t) => t.done);
 						if (allDone) {
-							const failed = pr.testcases.find(t => t.status_id !== 3);
+							const failed = pr.testcases.find((t) => t.status_id !== 3);
 							pr.status_id = failed ? failed.status_id : 3;
 							pr.status_label = failed ? failed.status_label : 'Accepted';
 							pr.runtime = pr.testcases.reduce((acc, t) => acc + (t.time_ms ?? 0), 0);
 							pr.memory = pr.testcases.reduce((acc, t) => Math.max(acc, t.memory_kb ?? 0), 0);
 							pr.done = true;
 						}
-						
+
 						// Trigger reactivity
 						results[prIdx] = { ...pr };
 						break;
@@ -210,7 +208,7 @@
 	$effect(() => {
 		if (form && 'success' in form && form.success && form.results) {
 			const formResults = form.results as { token: string; testcase_index: number | null }[];
-			
+
 			// We need the ID of the new problem submission, which is not in form.results
 			// Simplest way: refresh from server to get the full structure
 			refreshResults();
@@ -222,17 +220,18 @@
 <div class="container mx-auto px-4 py-8">
 	<div class="flex flex-col gap-6">
 		<div class="flex flex-col gap-4">
-			<Button variant="ghost" size="sm" class="w-fit -ml-2" href="/problems">
+			<Button variant="ghost" size="sm" class="-ml-2 w-fit" href="/problems">
 				<ChevronLeft class="mr-1 h-4 w-4" /> 문제 목록으로 돌아가기
 			</Button>
 			<div class="flex flex-wrap items-center justify-between gap-4">
 				<div class="flex items-center gap-4">
 					<h1 class="text-4xl font-extrabold tracking-tight">{problem.id}. {problem.title}</h1>
-					{#if results.some(r => r.status_id === 3)}
+					{#if results.some((r) => r.status_id === 3)}
 						<Badge class="bg-green-500 hover:bg-green-600">SOLVED</Badge>
 					{/if}
 					<Badge variant="outline" class={cn('font-semibold shadow-sm', tier.color)}>
-						{tier.name} {problem.difficultyRating ?? ''}
+						{tier.name}
+						{problem.difficultyRating ?? ''}
 					</Badge>
 				</div>
 				<div class="flex gap-2">
@@ -242,10 +241,12 @@
 						</Button>
 					{/if}
 					<Badge variant="outline" class="flex items-center gap-1 bg-muted/50">
-						<Info class="h-3 w-3" /> {problem.timeLimit}
+						<Info class="h-3 w-3" />
+						{problem.timeLimit}
 					</Badge>
 					<Badge variant="outline" class="flex items-center gap-1 bg-muted/50">
-						<Info class="h-3 w-3" /> {problem.memoryLimit}
+						<Info class="h-3 w-3" />
+						{problem.memoryLimit}
 					</Badge>
 				</div>
 			</div>
@@ -270,7 +271,7 @@
 			<Tabs.Content value="description" class="mt-6 flex flex-col gap-8">
 				<section>
 					<h3 class="mb-3 text-xl font-bold">문제 설명</h3>
-					<div class="prose prose-slate max-w-none dark:prose-invert">
+					<div class="prose prose-slate dark:prose-invert max-w-none">
 						<p>{problem.description}</p>
 					</div>
 				</section>
@@ -295,16 +296,18 @@
 						<div class="grid gap-4 md:grid-cols-2">
 							<div>
 								<h3 class="mb-3 text-lg font-bold">예제 입력 {i + 1}</h3>
-								<pre class="overflow-auto rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-50">{tc.input}</pre>
+								<pre
+									class="overflow-auto rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-50">{tc.input}</pre>
 							</div>
 							<div>
 								<h3 class="mb-3 text-lg font-bold">예제 출력 {i + 1}</h3>
-								<pre class="overflow-auto rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-50">{tc.output}</pre>
+								<pre
+									class="overflow-auto rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-50">{tc.output}</pre>
 							</div>
 						</div>
 					{/each}
 					{#if problem.testcases.length === 0}
-						<div class="text-muted-foreground italic text-sm py-4 border-y">
+						<div class="border-y py-4 text-sm text-muted-foreground italic">
 							표시할 예제 입출력이 없습니다.
 						</div>
 					{/if}
@@ -328,7 +331,9 @@
 					</Card.Header>
 
 					{#if languagesError}
-						<div class="mx-6 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+						<div
+							class="mx-6 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"
+						>
 							채점 서버에 연결할 수 없습니다: {languagesError}
 						</div>
 					{/if}
@@ -373,7 +378,9 @@
 							</div>
 
 							{#if form && 'message' in form && form.message}
-								<div class="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+								<div
+									class="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"
+								>
 									{form.message}
 								</div>
 							{/if}
@@ -430,10 +437,13 @@
 				{:else}
 					<div class="flex flex-col gap-6">
 						{#each results as pr (pr.id)}
-							<Card.Root class={cn(pr.status_id === 3 && "border-green-500/50 bg-green-500/5")}>
+							<Card.Root class={cn(pr.status_id === 3 && 'border-green-500/50 bg-green-500/5')}>
 								<Card.Header class="flex flex-row items-center justify-between gap-4 pb-2">
 									<div class="flex items-center gap-3">
-										<Badge variant={statusVariant(pr.status_id)} class="px-3 py-1 text-sm font-bold">
+										<Badge
+											variant={statusVariant(pr.status_id)}
+											class="px-3 py-1 text-sm font-bold"
+										>
 											{#if !pr.done}
 												<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 											{/if}
@@ -452,22 +462,32 @@
 								<Card.Content>
 									<div class="grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
 										{#each pr.testcases as tr}
-											<div 
+											<div
 												class={cn(
-													"flex flex-col items-center justify-center rounded-md border p-2 text-center transition-all",
-													tr.status_id === 3 ? "border-green-500/30 bg-green-500/10 text-green-700" : 
-													tr.status_id === 1 || tr.status_id === 2 ? "border-muted bg-muted/50" : 
-													"border-destructive/30 bg-destructive/10 text-destructive"
+													'flex flex-col items-center justify-center rounded-md border p-2 text-center transition-all',
+													tr.status_id === 3
+														? 'border-green-500/30 bg-green-500/10 text-green-700'
+														: tr.status_id === 1 || tr.status_id === 2
+															? 'border-muted bg-muted/50'
+															: 'border-destructive/30 bg-destructive/10 text-destructive'
 												)}
 												title={tr.status_label}
 											>
-												<span class="text-[10px] font-bold uppercase opacity-70">TC {tr.testcase_index ?? '?'}</span>
+												<span class="text-[10px] font-bold uppercase opacity-70"
+													>TC {tr.testcase_index ?? '?'}</span
+												>
 												{#if tr.status_id === 3}
-													<Badge variant="outline" class="mt-1 h-5 border-green-500/50 px-1 text-[10px] text-green-600">PASS</Badge>
+													<Badge
+														variant="outline"
+														class="mt-1 h-5 border-green-500/50 px-1 text-[10px] text-green-600"
+														>PASS</Badge
+													>
 												{:else if tr.status_id === 1 || tr.status_id === 2}
 													<Loader2 class="mt-1 h-3 w-3 animate-spin opacity-50" />
 												{:else}
-													<span class="mt-1 text-[10px] font-bold line-clamp-1">{tr.status_label.split(' ')[0]}</span>
+													<span class="mt-1 line-clamp-1 text-[10px] font-bold"
+														>{tr.status_label.split(' ')[0]}</span
+													>
 												{/if}
 											</div>
 										{/each}
@@ -475,10 +495,16 @@
 
 									{#if pr.status_id !== 3 && pr.status_id > 2}
 										<div class="mt-4 space-y-3">
-											{#each pr.testcases.filter(t => t.status_id !== 3 && t.status_id > 2).slice(0, 1) as errorTr}
+											{#each pr.testcases
+												.filter((t) => t.status_id !== 3 && t.status_id > 2)
+												.slice(0, 1) as errorTr}
 												<div class="rounded-lg bg-slate-950 p-4 font-mono text-xs text-slate-50">
-													<div class="mb-2 flex items-center justify-between border-b border-slate-800 pb-2">
-														<span class="font-bold text-destructive">Testcase {errorTr.testcase_index} Failure</span>
+													<div
+														class="mb-2 flex items-center justify-between border-b border-slate-800 pb-2"
+													>
+														<span class="font-bold text-destructive"
+															>Testcase {errorTr.testcase_index} Failure</span
+														>
 														<span class="opacity-70">{errorTr.status_label}</span>
 													</div>
 													{#if errorTr.compile_output}

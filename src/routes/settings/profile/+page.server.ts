@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		where: eq(account.userId, locals.user.id)
 	});
 
-	const hasPassword = userAccounts.some(acc => acc.providerId === 'credential');
+	const hasPassword = userAccounts.some((acc) => acc.providerId === 'credential');
 
 	return {
 		currentUser: locals.user,
@@ -34,29 +34,30 @@ export const actions: Actions = {
 		const image = formData.get('image') as string;
 
 		if (!name || name.length < 2) {
-			return fail(400, { 
+			return fail(400, {
 				message: '닉네임은 최소 2글자 이상이어야 합니다.',
-				action: 'updateProfile' 
+				action: 'updateProfile'
 			});
 		}
 
 		try {
-			await db.update(user)
-				.set({ 
-					name, 
+			await db
+				.update(user)
+				.set({
+					name,
 					image: image || null,
 					updatedAt: new Date()
 				})
 				.where(eq(user.id, locals.user.id));
 
-			return { 
-				success: true, 
+			return {
+				success: true,
 				message: '프로필이 성공적으로 업데이트되었습니다!',
 				action: 'updateProfile'
 			};
 		} catch (e) {
 			console.error(e);
-			return fail(500, { 
+			return fail(500, {
 				message: '프로필 업데이트 중 오류가 발생했습니다.',
 				action: 'updateProfile'
 			});

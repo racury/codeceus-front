@@ -38,23 +38,26 @@ export const actions: Actions = {
 		}
 
 		try {
-			const [newProblem] = await db.insert(schema.problems).values({
-				title,
-				description,
-				inputFormat,
-				outputFormat,
-				sampleInput,
-				sampleOutput,
-				hint,
-				timeLimit: timeLimit || '1000ms',
-				memoryLimit: memoryLimit || '256MB',
-				difficultyRating: null, // 기본적으로 Unrated
-				createdById: locals.user.id
-			}).returning();
+			const [newProblem] = await db
+				.insert(schema.problems)
+				.values({
+					title,
+					description,
+					inputFormat,
+					outputFormat,
+					sampleInput,
+					sampleOutput,
+					hint,
+					timeLimit: timeLimit || '1000ms',
+					memoryLimit: memoryLimit || '256MB',
+					difficultyRating: null, // 기본적으로 Unrated
+					createdById: locals.user.id
+				})
+				.returning();
 
 			if (categoryIds.length > 0) {
 				await db.insert(schema.problemsToCategories).values(
-					categoryIds.map(catId => ({
+					categoryIds.map((catId) => ({
 						problemId: newProblem.id,
 						categoryId: catId
 					}))

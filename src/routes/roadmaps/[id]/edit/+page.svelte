@@ -80,7 +80,10 @@
 	}
 
 	function handleConnect(connection: Connection) {
-		edges = addEdge({ ...connection, type: 'smoothstep', animated: true, class: 'stroke-foreground stroke-2' }, edges);
+		edges = addEdge(
+			{ ...connection, type: 'smoothstep', animated: true, class: 'stroke-foreground stroke-2' },
+			edges
+		);
 	}
 
 	function deleteSelected() {
@@ -101,7 +104,8 @@
 				<div>
 					<h1 class="text-xl font-bold">{roadmap.title} 편집</h1>
 					<p class="text-xs text-muted-foreground">
-						노드를 드래그하여 배치하고 연결점을 이어주세요. 항목을 선택하고 [선택 삭제] 또는 [Backspace]를 누르면 제거됩니다.
+						노드를 드래그하여 배치하고 연결점을 이어주세요. 항목을 선택하고 [선택 삭제] 또는
+						[Backspace]를 누르면 제거됩니다.
 					</p>
 				</div>
 			</div>
@@ -203,13 +207,12 @@
 			</div>
 		{/if}
 
-		<SvelteFlow 
+		<SvelteFlow
 			bind:nodes
 			bind:edges
 			{nodeTypes}
 			onconnect={handleConnect}
 			fitView
-
 			class="bg-slate-50 dark:bg-slate-950"
 		>
 			<Background variant={BackgroundVariant.Dots} />

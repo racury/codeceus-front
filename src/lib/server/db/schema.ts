@@ -1,4 +1,13 @@
-import { pgTable, serial, integer, text, timestamp, boolean, index, primaryKey } from 'drizzle-orm/pg-core';
+import {
+	pgTable,
+	serial,
+	integer,
+	text,
+	timestamp,
+	boolean,
+	index,
+	primaryKey
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const problems = pgTable('problems', {
@@ -23,89 +32,91 @@ export const categories = pgTable('categories', {
 	name: text('name').notNull().unique()
 });
 
-export const problemsToCategories = pgTable('problems_to_categories', {
-	problemId: integer('problem_id')
-		.notNull()
-		.references(() => problems.id, { onDelete: 'cascade' }),
-	categoryId: integer('category_id')
-		.notNull()
-		.references(() => categories.id, { onDelete: 'cascade' })
-}, (t) => [
-	primaryKey({ columns: [t.problemId, t.categoryId] })
-]);
+export const problemsToCategories = pgTable(
+	'problems_to_categories',
+	{
+		problemId: integer('problem_id')
+			.notNull()
+			.references(() => problems.id, { onDelete: 'cascade' }),
+		categoryId: integer('category_id')
+			.notNull()
+			.references(() => categories.id, { onDelete: 'cascade' })
+	},
+	(t) => [primaryKey({ columns: [t.problemId, t.categoryId] })]
+);
 
-export const user = pgTable("user", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified").default(false).notNull(),
-  image: text("image"),
-  role: text("role").notNull().default("user"),
-  rating: integer("rating").notNull().default(0),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
-    .notNull(),
+export const user = pgTable('user', {
+	id: text('id').primaryKey(),
+	name: text('name').notNull(),
+	email: text('email').notNull().unique(),
+	emailVerified: boolean('email_verified').default(false).notNull(),
+	image: text('image'),
+	role: text('role').notNull().default('user'),
+	rating: integer('rating').notNull().default(0),
+	createdAt: timestamp('created_at').defaultNow().notNull(),
+	updatedAt: timestamp('updated_at')
+		.defaultNow()
+		.$onUpdate(() => /* @__PURE__ */ new Date())
+		.notNull()
 });
 
 export const session = pgTable(
-  "session",
-  {
-    id: text("id").primaryKey(),
-    expiresAt: timestamp("expires_at").notNull(),
-    token: text("token").notNull().unique(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .$onUpdate(() => /* @__PURE__ */ new Date())
-      .notNull(),
-    ipAddress: text("ip_address"),
-    userAgent: text("user_agent"),
-    userId: text("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-  },
-  (table) => [index("session_userId_idx").on(table.userId)],
+	'session',
+	{
+		id: text('id').primaryKey(),
+		expiresAt: timestamp('expires_at').notNull(),
+		token: text('token').notNull().unique(),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at')
+			.$onUpdate(() => /* @__PURE__ */ new Date())
+			.notNull(),
+		ipAddress: text('ip_address'),
+		userAgent: text('user_agent'),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' })
+	},
+	(table) => [index('session_userId_idx').on(table.userId)]
 );
 
 export const account = pgTable(
-  "account",
-  {
-    id: text("id").primaryKey(),
-    accountId: text("account_id").notNull(),
-    providerId: text("provider_id").notNull(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-    accessToken: text("access_token"),
-    refreshToken: text("refresh_token"),
-    idToken: text("id_token"),
-    accessTokenExpiresAt: timestamp("access_token_expires_at"),
-    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
-    scope: text("scope"),
-    password: text("password"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .$onUpdate(() => /* @__PURE__ */ new Date())
-      .notNull(),
-  },
-  (table) => [index("account_userId_idx").on(table.userId)],
+	'account',
+	{
+		id: text('id').primaryKey(),
+		accountId: text('account_id').notNull(),
+		providerId: text('provider_id').notNull(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		accessToken: text('access_token'),
+		refreshToken: text('refresh_token'),
+		idToken: text('id_token'),
+		accessTokenExpiresAt: timestamp('access_token_expires_at'),
+		refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+		scope: text('scope'),
+		password: text('password'),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at')
+			.$onUpdate(() => /* @__PURE__ */ new Date())
+			.notNull()
+	},
+	(table) => [index('account_userId_idx').on(table.userId)]
 );
 
 export const verification = pgTable(
-  "verification",
-  {
-    id: text("id").primaryKey(),
-    identifier: text("identifier").notNull(),
-    value: text("value").notNull(),
-    expiresAt: timestamp("expires_at").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .defaultNow()
-      .$onUpdate(() => /* @__PURE__ */ new Date())
-      .notNull(),
-  },
-  (table) => [index("verification_identifier_idx").on(table.identifier)],
+	'verification',
+	{
+		id: text('id').primaryKey(),
+		identifier: text('identifier').notNull(),
+		value: text('value').notNull(),
+		expiresAt: timestamp('expires_at').notNull(),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at')
+			.defaultNow()
+			.$onUpdate(() => /* @__PURE__ */ new Date())
+			.notNull()
+	},
+	(table) => [index('verification_identifier_idx').on(table.identifier)]
 );
 
 export const problemSubmissions = pgTable('problem_submissions', {
@@ -134,8 +145,9 @@ export const submissions = pgTable('submissions', {
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id, { onDelete: 'cascade' }),
-	problemSubmissionId: integer('problem_submission_id')
-		.references(() => problemSubmissions.id, { onDelete: 'cascade' }),
+	problemSubmissionId: integer('problem_submission_id').references(() => problemSubmissions.id, {
+		onDelete: 'cascade'
+	}),
 	token: text('token').notNull().unique(),
 	testcaseIndex: integer('testcase_index'),
 	language: text('language').notNull(),
@@ -163,17 +175,19 @@ export const testcases = pgTable('testcases', {
 	createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
-export const solvedProblems = pgTable('solved_problems', {
-	userId: text('user_id')
-		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' }),
-	problemId: integer('problem_id')
-		.notNull()
-		.references(() => problems.id, { onDelete: 'cascade' }),
-	solvedAt: timestamp('solved_at').defaultNow().notNull()
-}, (t) => [
-	primaryKey({ columns: [t.userId, t.problemId] })
-]);
+export const solvedProblems = pgTable(
+	'solved_problems',
+	{
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		problemId: integer('problem_id')
+			.notNull()
+			.references(() => problems.id, { onDelete: 'cascade' }),
+		solvedAt: timestamp('solved_at').defaultNow().notNull()
+	},
+	(t) => [primaryKey({ columns: [t.userId, t.problemId] })]
+);
 
 export const problemsets = pgTable('problemsets', {
 	id: serial('id').primaryKey(),
@@ -186,17 +200,19 @@ export const problemsets = pgTable('problemsets', {
 	updatedAt: timestamp('updated_at').defaultNow().notNull()
 });
 
-export const problemsetProblems = pgTable('problemset_problems', {
-	problemsetId: integer('problemset_id')
-		.notNull()
-		.references(() => problemsets.id, { onDelete: 'cascade' }),
-	problemId: integer('problem_id')
-		.notNull()
-		.references(() => problems.id, { onDelete: 'cascade' }),
-	order: integer('order').notNull().default(0)
-}, (t) => [
-	primaryKey({ columns: [t.problemsetId, t.problemId] })
-]);
+export const problemsetProblems = pgTable(
+	'problemset_problems',
+	{
+		problemsetId: integer('problemset_id')
+			.notNull()
+			.references(() => problemsets.id, { onDelete: 'cascade' }),
+		problemId: integer('problem_id')
+			.notNull()
+			.references(() => problems.id, { onDelete: 'cascade' }),
+		order: integer('order').notNull().default(0)
+	},
+	(t) => [primaryKey({ columns: [t.problemsetId, t.problemId] })]
+);
 
 export const roadmaps = pgTable('roadmaps', {
 	id: serial('id').primaryKey(),
@@ -235,13 +251,13 @@ export const roadmapEdges = pgTable('roadmap_edges', {
 });
 
 export const userRelations = relations(user, ({ many }) => ({
-  sessions: many(session),
-  accounts: many(account),
-  submissions: many(submissions),
-  problemSubmissions: many(problemSubmissions),
-  solvedProblems: many(solvedProblems),
-  problemsets: many(problemsets),
-  roadmaps: many(roadmaps),
+	sessions: many(session),
+	accounts: many(account),
+	submissions: many(submissions),
+	problemSubmissions: many(problemSubmissions),
+	solvedProblems: many(solvedProblems),
+	problemsets: many(problemsets),
+	roadmaps: many(roadmaps)
 }));
 
 export const problemsRelations = relations(problems, ({ many }) => ({
@@ -306,27 +322,27 @@ export const problemsToCategoriesRelations = relations(problemsToCategories, ({ 
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
+	user: one(user, {
+		fields: [session.userId],
+		references: [user.id]
+	})
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
+	user: one(user, {
+		fields: [account.userId],
+		references: [user.id]
+	})
 }));
 
 export const submissionRelations = relations(submissions, ({ one }) => ({
 	user: one(user, {
 		fields: [submissions.userId],
-		references: [user.id],
+		references: [user.id]
 	}),
 	problem: one(problems, {
 		fields: [submissions.problemId],
-		references: [problems.id],
+		references: [problems.id]
 	}),
 	problemSubmission: one(problemSubmissions, {
 		fields: [submissions.problemSubmissionId],
@@ -395,29 +411,33 @@ export const competitions = pgTable('competitions', {
 	updatedAt: timestamp('updated_at').defaultNow().notNull()
 });
 
-export const competitionProblems = pgTable('competition_problems', {
-	competitionId: integer('competition_id')
-		.notNull()
-		.references(() => competitions.id, { onDelete: 'cascade' }),
-	problemId: integer('problem_id')
-		.notNull()
-		.references(() => problems.id, { onDelete: 'cascade' }),
-	order: integer('order').notNull().default(0)
-}, (t) => [
-	primaryKey({ columns: [t.competitionId, t.problemId] })
-]);
+export const competitionProblems = pgTable(
+	'competition_problems',
+	{
+		competitionId: integer('competition_id')
+			.notNull()
+			.references(() => competitions.id, { onDelete: 'cascade' }),
+		problemId: integer('problem_id')
+			.notNull()
+			.references(() => problems.id, { onDelete: 'cascade' }),
+		order: integer('order').notNull().default(0)
+	},
+	(t) => [primaryKey({ columns: [t.competitionId, t.problemId] })]
+);
 
-export const competitionParticipants = pgTable('competition_participants', {
-	competitionId: integer('competition_id')
-		.notNull()
-		.references(() => competitions.id, { onDelete: 'cascade' }),
-	userId: text('user_id')
-		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' }),
-	joinedAt: timestamp('joined_at').defaultNow().notNull()
-}, (t) => [
-	primaryKey({ columns: [t.competitionId, t.userId] })
-]);
+export const competitionParticipants = pgTable(
+	'competition_participants',
+	{
+		competitionId: integer('competition_id')
+			.notNull()
+			.references(() => competitions.id, { onDelete: 'cascade' }),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		joinedAt: timestamp('joined_at').defaultNow().notNull()
+	},
+	(t) => [primaryKey({ columns: [t.competitionId, t.userId] })]
+);
 
 export const competitionsRelations = relations(competitions, ({ one, many }) => ({
 	createdBy: one(user, {

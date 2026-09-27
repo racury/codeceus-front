@@ -82,8 +82,7 @@
 							<div class="flex items-center gap-6 rounded-lg bg-muted/30 p-4">
 								<Avatar.Root class="h-20 w-20 border border-border shadow-sm">
 									<Avatar.Image src={imageUrl} alt={name} />
-									<Avatar.Fallback class="text-xl font-bold"
-										>{name ? name[0] : '?'}</Avatar.Fallback
+									<Avatar.Fallback class="text-xl font-bold">{name ? name[0] : '?'}</Avatar.Fallback
 									>
 								</Avatar.Root>
 								<div class="space-y-1">
@@ -182,7 +181,8 @@
 
 							<div class="space-y-2">
 								<Label for="newPassword" class="flex items-center gap-2">
-									<Lock class="h-4 w-4" /> {data.hasPassword ? '새 비밀번호' : '비밀번호'}
+									<Lock class="h-4 w-4" />
+									{data.hasPassword ? '새 비밀번호' : '비밀번호'}
 								</Label>
 								<Input
 									id="newPassword"
@@ -198,9 +198,8 @@
 
 							<div class="space-y-2">
 								<Label for="confirmPassword" class="flex items-center gap-2">
-									<ShieldCheck class="h-4 w-4" /> {data.hasPassword
-										? '새 비밀번호 확인'
-										: '비밀번호 확인'}
+									<ShieldCheck class="h-4 w-4" />
+									{data.hasPassword ? '새 비밀번호 확인' : '비밀번호 확인'}
 								</Label>
 								<Input
 									id="confirmPassword"

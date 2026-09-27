@@ -33,10 +33,13 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			where: eq(schema.submissions.userId, locals.user.id),
 			columns: { problemId: true }
 		});
-		userSubmissions.forEach(sub => solvedProblemIds.add(sub.problemId));
+		userSubmissions.forEach((sub) => solvedProblemIds.add(sub.problemId));
 	}
 
-	const nodeProgress: Record<string, { total: number; solved: number; isCompleted: boolean; isLocked: boolean }> = {};
+	const nodeProgress: Record<
+		string,
+		{ total: number; solved: number; isCompleted: boolean; isLocked: boolean }
+	> = {};
 
 	for (const node of roadmap.nodes) {
 		const total = node.problemset.problems.length;
@@ -47,7 +50,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			}
 		}
 		// A problemset is considered "completed" for roadmap progression if at least half of the problems are solved
-		const isCompleted = total > 0 ? (solved / total) >= 0.5 : true; 
+		const isCompleted = total > 0 ? solved / total >= 0.5 : true;
 		nodeProgress[node.id] = { total, solved, isCompleted, isLocked: false };
 	}
 

@@ -34,17 +34,16 @@
 	const currentCategoryIds = $derived(problem.categories.map((c) => c.categoryId));
 
 	// Testcase state - sync with problem data when it changes
-	let localTestcases = $state(problem.testcases.map(tc => ({ ...tc })) || []);
+	let localTestcases = $state(problem.testcases.map((tc) => ({ ...tc })) || []);
 
 	// Reset local state when server data changes (e.g. after save)
 	$effect(() => {
-		localTestcases = problem.testcases.map(tc => ({ ...tc })) || [];
+		localTestcases = problem.testcases.map((tc) => ({ ...tc })) || [];
 	});
 
 	function addTestcase() {
-		localTestcases = [...localTestcases, { input: "", output: "", isPublic: false }];
+		localTestcases = [...localTestcases, { input: '', output: '', isPublic: false }];
 	}
-
 
 	function removeTestcase(index: number) {
 		localTestcases = localTestcases.filter((_, i) => i !== index);
@@ -86,9 +85,9 @@
 				>
 					<span class="px-2 text-xs font-bold text-destructive">정말 삭제할까요?</span>
 					<form method="POST" action="/problems/{problem.id}/edit?/deleteProblem" use:enhance>
-						<button 
-							type="submit" 
-							class="inline-flex items-center justify-center rounded-md bg-destructive px-3 py-1.5 text-sm font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors"
+						<button
+							type="submit"
+							class="text-destructive-foreground inline-flex items-center justify-center rounded-md bg-destructive px-3 py-1.5 text-sm font-medium transition-colors hover:bg-destructive/90"
 						>
 							네, 삭제
 						</button>
@@ -191,11 +190,15 @@
 						<Card.Content class="space-y-6">
 							<div class="space-y-2">
 								<Label for="hint">힌트</Label>
-								<Textarea id="hint" name="hint" defaultValue={problem.hint ?? ''} placeholder="문제를 푸는 데 도움이 될 힌트를 적어주세요." />
+								<Textarea
+									id="hint"
+									name="hint"
+									defaultValue={problem.hint ?? ''}
+									placeholder="문제를 푸는 데 도움이 될 힌트를 적어주세요."
+								/>
 							</div>
 						</Card.Content>
 					</Card.Root>
-
 				</div>
 
 				<div class="space-y-8">
@@ -297,7 +300,12 @@
 
 				<div class="grid gap-6">
 					{#each localTestcases as tc, i}
-						<Card.Root class={cn("relative transition-all border-2", tc.isPublic ? "border-primary/50 bg-primary/5" : "border-transparent")}>
+						<Card.Root
+							class={cn(
+								'relative border-2 transition-all',
+								tc.isPublic ? 'border-primary/50 bg-primary/5' : 'border-transparent'
+							)}
+						>
 							<Button
 								type="button"
 								variant="ghost"
@@ -310,24 +318,29 @@
 							<Card.Header class="pb-2">
 								<div class="flex items-center gap-4">
 									<div class="flex items-center gap-2">
-										<Badge variant={tc.isPublic ? "default" : "outline"}>
-											{tc.isPublic ? "공개 예제" : `테스트케이스 #${i + 1}`}
+										<Badge variant={tc.isPublic ? 'default' : 'outline'}>
+											{tc.isPublic ? '공개 예제' : `테스트케이스 #${i + 1}`}
 										</Badge>
 									</div>
-									<label class="flex cursor-pointer items-center gap-2 group">
+									<label class="group flex cursor-pointer items-center gap-2">
 										<input
 											type="checkbox"
 											name={`testcaseIsPublic_${i}`}
 											bind:checked={tc.isPublic}
 											class="h-4 w-4 rounded border-input text-primary transition-all"
 										/>
-										<span class="text-xs font-bold group-hover:text-primary transition-colors">문제 페이지에 예제로 노출</span>
+										<span class="text-xs font-bold transition-colors group-hover:text-primary"
+											>문제 페이지에 예제로 노출</span
+										>
 									</label>
 								</div>
 							</Card.Header>
 							<Card.Content class="grid gap-4 pt-4 md:grid-cols-2">
 								<div class="space-y-2">
-									<Label class="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Input</Label>
+									<Label
+										class="text-[11px] font-bold tracking-wider text-muted-foreground uppercase"
+										>Input</Label
+									>
 									<Textarea
 										name="testcaseInput"
 										bind:value={tc.input}
@@ -335,7 +348,10 @@
 									/>
 								</div>
 								<div class="space-y-2">
-									<Label class="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Output</Label>
+									<Label
+										class="text-[11px] font-bold tracking-wider text-muted-foreground uppercase"
+										>Output</Label
+									>
 									<Textarea
 										name="testcaseOutput"
 										bind:value={tc.output}

@@ -127,7 +127,9 @@
 										<span class="text-muted-foreground">참가 인원</span>
 										<span class="font-medium">{contest.participants}명</span>
 									</div>
-									<Button class="mt-2 w-full" href={`/competitions/${contest.id}`}>지금 신청하기</Button>
+									<Button class="mt-2 w-full" href={`/competitions/${contest.id}`}
+										>지금 신청하기</Button
+									>
 								</div>
 							</Card.Content>
 						</Card.Root>

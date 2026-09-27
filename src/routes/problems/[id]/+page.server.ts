@@ -38,7 +38,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	let userSubmissions: any[] = [];
 	if (locals.user) {
 		userSubmissions = await db.query.problemSubmissions.findMany({
-			where: and(eq(problemSubmissions.problemId, id), eq(problemSubmissions.userId, locals.user.id)),
+			where: and(
+				eq(problemSubmissions.problemId, id),
+				eq(problemSubmissions.userId, locals.user.id)
+			),
 			with: {
 				testcaseSubmissions: {
 					orderBy: (s, { asc }) => [asc(s.testcaseIndex)]
@@ -112,14 +115,17 @@ export const actions: Actions = {
 			);
 
 			await db.transaction(async (tx) => {
-				const [ps] = await tx.insert(problemSubmissions).values({
-					problemId: id,
-					userId: locals.user!.id,
-					language,
-					code: source_code,
-					status: 'Processing',
-					statusId: 2
-				}).returning();
+				const [ps] = await tx
+					.insert(problemSubmissions)
+					.values({
+						problemId: id,
+						userId: locals.user!.id,
+						language,
+						code: source_code,
+						status: 'Processing',
+						statusId: 2
+					})
+					.returning();
 
 				await tx.insert(submissions).values(
 					batch.map((b, i) => ({

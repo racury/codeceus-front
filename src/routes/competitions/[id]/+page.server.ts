@@ -24,8 +24,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	if (!competition) throw error(404, 'Competition not found');
 
-	const isParticipant = locals.user 
-		? competition.participants.some(p => p.userId === locals.user.id) 
+	const isParticipant = locals.user
+		? competition.participants.some((p) => p.userId === locals.user.id)
 		: false;
 
 	return {
@@ -51,10 +51,13 @@ export const actions: Actions = {
 		}
 
 		try {
-			await db.insert(schema.competitionParticipants).values({
-				competitionId,
-				userId: locals.user.id
-			}).onConflictDoNothing();
+			await db
+				.insert(schema.competitionParticipants)
+				.values({
+					competitionId,
+					userId: locals.user.id
+				})
+				.onConflictDoNothing();
 
 			return { success: true };
 		} catch (err) {

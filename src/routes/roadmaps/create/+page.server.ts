@@ -22,11 +22,14 @@ export const actions: Actions = {
 
 		let newId: number;
 		try {
-			const [newRoadmap] = await db.insert(roadmaps).values({
-				title,
-				description,
-				createdById: locals.user.id
-			}).returning();
+			const [newRoadmap] = await db
+				.insert(roadmaps)
+				.values({
+					title,
+					description,
+					createdById: locals.user.id
+				})
+				.returning();
 			newId = newRoadmap.id;
 		} catch (err) {
 			console.error(err);

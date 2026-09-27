@@ -44,13 +44,16 @@ export const actions: Actions = {
 
 		let newId: number;
 		try {
-			const [newComp] = await db.insert(competitions).values({
-				title,
-				description,
-				startTime,
-				endTime,
-				createdById: locals.user.id
-			}).returning();
+			const [newComp] = await db
+				.insert(competitions)
+				.values({
+					title,
+					description,
+					startTime,
+					endTime,
+					createdById: locals.user.id
+				})
+				.returning();
 			newId = newComp.id;
 
 			if (problemIds.length > 0) {

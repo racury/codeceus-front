@@ -48,10 +48,14 @@
 					class="flex items-center gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-1"
 				>
 					<span class="px-2 text-xs font-bold text-destructive">정말 삭제할까요?</span>
-					<form method="POST" action="/problemsets/{problemset.id}/edit?/deleteProblemset" use:enhance>
-						<button 
-							type="submit" 
-							class="inline-flex items-center justify-center rounded-md bg-destructive px-3 py-1.5 text-sm font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors"
+					<form
+						method="POST"
+						action="/problemsets/{problemset.id}/edit?/deleteProblemset"
+						use:enhance
+					>
+						<button
+							type="submit"
+							class="text-destructive-foreground inline-flex items-center justify-center rounded-md bg-destructive px-3 py-1.5 text-sm font-medium transition-colors hover:bg-destructive/90"
 						>
 							네, 삭제
 						</button>

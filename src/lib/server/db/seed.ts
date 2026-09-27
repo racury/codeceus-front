@@ -12,7 +12,7 @@ const db = drizzle(client, { schema });
 
 async function seed() {
 	console.log('Seeding categories and problems...');
-	
+
 	// 1. 기존 데이터 삭제 (연쇄 삭제됨)
 	await db.delete(schema.problems);
 	await db.delete(schema.categories);
@@ -25,7 +25,7 @@ async function seed() {
 		createdCategories.push(cat);
 	}
 
-	const getCatId = (name: string) => createdCategories.find(c => c.name === name)!.id;
+	const getCatId = (name: string) => createdCategories.find((c) => c.name === name)!.id;
 
 	// 3. 문제 데이터 생성
 	const problems = [
@@ -50,8 +50,10 @@ async function seed() {
 				difficultyRating: 950,
 				timeLimit: '2000ms',
 				memoryLimit: '512MB',
-				description: '두 수열이 주어졌을 때, 모두의 부분 수열이 되는 수열 중 가장 긴 것을 찾는 프로그램을 작성하시오.',
-				inputFormat: '첫째 줄과 둘째 줄에 두 문자열이 주어진다. 문자열은 알파벳 대문자로만 이루어져 있으며, 최대 1000글자로 이루어져 있다.',
+				description:
+					'두 수열이 주어졌을 때, 모두의 부분 수열이 되는 수열 중 가장 긴 것을 찾는 프로그램을 작성하시오.',
+				inputFormat:
+					'첫째 줄과 둘째 줄에 두 문자열이 주어진다. 문자열은 알파벳 대문자로만 이루어져 있으며, 최대 1000글자로 이루어져 있다.',
 				outputFormat: '첫째 줄에 입력으로 주어진 두 문자열의 LCS의 길이를 출력한다.',
 				sampleInput: 'ACAYKP\nCAPCAK',
 				sampleOutput: '4',
