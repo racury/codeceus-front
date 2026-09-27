@@ -1,5 +1,6 @@
-import { recalculateAllRatings } from '../rating';
+// Must stay the first import: ../rating loads the DB module, which needs DATABASE_URL.
 import 'dotenv/config';
+import { recalculateAllRatings } from '../rating';
 
 async function main() {
 	try {
