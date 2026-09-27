@@ -1,21 +1,15 @@
-import type { Session } from 'better-auth/minimal';
+import type { auth } from '$lib/server/auth';
+
+type AuthSession = typeof auth.$Infer.Session;
 
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 declare global {
 	namespace App {
 		interface Locals {
-			user?: {
-				id: string;
-				name: string;
-				email: string;
-				emailVerified: boolean;
-				image?: string | null;
-				role: string;
-				createdAt: Date;
-				updatedAt: Date;
-			};
-			session?: Session;
+			// Inferred from the Better Auth config, including additionalFields like `role`.
+			user?: AuthSession['user'];
+			session?: AuthSession['session'];
 		}
 
 		// interface Error {}

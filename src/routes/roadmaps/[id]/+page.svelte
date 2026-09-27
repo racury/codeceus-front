@@ -12,7 +12,6 @@
 		type Edge,
 		BackgroundVariant
 	} from '@xyflow/svelte';
-	import { writable } from 'svelte/store';
 	import RoadmapNode from './RoadmapNode.svelte';
 
 	let { data } = $props();
@@ -113,7 +112,7 @@
 			class="bg-slate-50 dark:bg-slate-950"
 		>
 			<Background variant={BackgroundVariant.Dots} />
-			<Controls showInteractive={false} />
+			<Controls showLock={false} />
 			<MiniMap />
 		</SvelteFlow>
 	</div>

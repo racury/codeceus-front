@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import * as Table from '$lib/components/ui/table';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import { Slider } from '$lib/components/ui/slider';
 	import * as Select from '$lib/components/ui/select';
-	import { Search, Filter, Circle, ArrowUpDown, Tag, Plus } from '@lucide/svelte';
+	import { Search, Filter, Circle, Tag, Plus } from '@lucide/svelte';
 	import { slide } from 'svelte/transition';
 
 	import { page } from '$app/state';
@@ -84,12 +85,10 @@
 
 				// 난이도 필터: 언레이티드(null)는 슬라이더가 최소값(0)을 포함할 때만 보여줌
 				const rating = p.difficultyRating;
-				let matchesDifficulty = false;
-				if (rating === null) {
-					matchesDifficulty = difficultyRange[0] === 0;
-				} else {
-					matchesDifficulty = rating >= difficultyRange[0] && rating <= difficultyRange[1];
-				}
+				const matchesDifficulty =
+					rating === null
+						? difficultyRange[0] === 0
+						: rating >= difficultyRange[0] && rating <= difficultyRange[1];
 
 				const problemCatIds = p.categories.map((c) => c.categoryId);
 				const matchesCategory =
@@ -192,7 +191,7 @@
 								/>
 							</div>
 							<div class="flex justify-between px-1 text-[10px] text-muted-foreground">
-								{#each TIERS as tier}
+								{#each TIERS as tier (tier.name)}
 									<div class="flex flex-col items-center gap-1">
 										<div class={cn('h-1.5 w-1.5 rounded-full', tier.color.split(' ')[0])}></div>
 										<span>{tier.name}</span>
@@ -207,7 +206,7 @@
 								<Tag class="h-4 w-4" /> 카테고리 (OR 필터)
 							</span>
 							<div class="flex flex-wrap gap-2">
-								{#each categories as cat}
+								{#each categories as cat (cat.id)}
 									<Button
 										variant={selectedCategories.includes(cat.id) ? 'default' : 'outline'}
 										size="sm"
@@ -287,10 +286,10 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each filteredProblems as problem}
+					{#each filteredProblems as problem (problem.id)}
 						<Table.Row
 							class="cursor-pointer transition-colors hover:bg-muted/50"
-							onclick={() => goto(`/problems/${problem.id}`)}
+							onclick={() => goto(resolve('/problems/[id]', { id: String(problem.id) }))}
 						>
 							<Table.Cell>
 								<Circle class="h-5 w-5 text-muted-foreground/30" />
@@ -308,7 +307,7 @@
 							</Table.Cell>
 							<Table.Cell class="text-right">
 								<div class="flex flex-wrap justify-end gap-1">
-									{#each problem.categories as pc}
+									{#each problem.categories as pc (pc.categoryId)}
 										<Badge variant="secondary" class="h-5 bg-muted/50 px-1 text-[10px]">
 											{pc.category.name}
 										</Badge>

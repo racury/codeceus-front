@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db';
 import * as schema from '$lib/server/db/schema';
 import { error, fail, redirect } from '@sveltejs/kit';
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
@@ -24,9 +24,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	if (!competition) throw error(404, 'Competition not found');
 
-	const isParticipant = locals.user
-		? competition.participants.some((p) => p.userId === locals.user.id)
-		: false;
+	const userId = locals.user?.id;
+	const isParticipant = userId ? competition.participants.some((p) => p.userId === userId) : false;
 
 	return {
 		competition,

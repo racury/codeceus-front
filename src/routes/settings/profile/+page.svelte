@@ -21,23 +21,13 @@
 	let { data, form } = $props();
 	const user = $derived(data.currentUser);
 
-	let name = $state(user.name);
-	let imageUrl = $state(user.image ?? '');
+	// Writable deriveds: editable locally, reset when the server data changes
+	// (e.g. after a successful update).
+	let name = $derived(user.name);
+	let imageUrl = $derived(user.image ?? '');
 
-	// Sync local state when user data changes (e.g. after successful server update)
-	$effect(() => {
-		name = user.name;
-		imageUrl = user.image ?? '';
-	});
-
-	let activeTab = $state(form?.passwordError ? 'password' : 'general');
-
-	// Update active tab if form error state changes
-	$effect(() => {
-		if (form?.passwordError) {
-			activeTab = 'password';
-		}
-	});
+	// Jump to the password tab when that form reports an error.
+	let activeTab = $derived(form?.passwordError ? 'password' : 'general');
 </script>
 
 <div class="container mx-auto max-w-2xl px-4 py-10">

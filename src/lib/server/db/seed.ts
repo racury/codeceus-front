@@ -19,7 +19,7 @@ async function seed() {
 
 	// 2. 카테고리 생성
 	const categoryNames = ['기초', 'DP', 'Backtracking', 'Mathematics', 'String', 'Greedy'];
-	const createdCategories = [];
+	const createdCategories: (typeof schema.categories.$inferSelect)[] = [];
 	for (const name of categoryNames) {
 		const [cat] = await db.insert(schema.categories).values({ name }).returning();
 		createdCategories.push(cat);

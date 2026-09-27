@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import * as Card from '$lib/components/ui/card';
@@ -17,9 +18,7 @@
 		Layers,
 		AlertCircle,
 		Trash2,
-		Plus,
-		Eye,
-		EyeOff
+		Plus
 	} from '@lucide/svelte';
 	import { cn } from '$lib/utils';
 
@@ -33,13 +32,11 @@
 
 	const currentCategoryIds = $derived(problem.categories.map((c) => c.categoryId));
 
-	// Testcase state - sync with problem data when it changes
-	let localTestcases = $state(problem.testcases.map((tc) => ({ ...tc })) || []);
+	// Saved testcases carry id/createdAt; newly added ones don't yet.
+	type TestcaseDraft = { id?: number; input: string; output: string; isPublic: boolean };
 
-	// Reset local state when server data changes (e.g. after save)
-	$effect(() => {
-		localTestcases = problem.testcases.map((tc) => ({ ...tc })) || [];
-	});
+	// Writable derived: edited locally, reset when server data changes (e.g. after save)
+	let localTestcases = $derived<TestcaseDraft[]>(problem.testcases.map((tc) => ({ ...tc })));
 
 	function addTestcase() {
 		localTestcases = [...localTestcases, { input: '', output: '', isPublic: false }];
@@ -51,7 +48,7 @@
 
 	$effect(() => {
 		if (form?.success && activeTab !== 'testcases') {
-			goto(`/problems/${problem.id}`);
+			goto(resolve('/problems/[id]', { id: String(problem.id) }));
 		}
 	});
 
@@ -248,7 +245,7 @@
 						</Card.Header>
 						<Card.Content>
 							<div class="grid grid-cols-2 gap-3">
-								{#each data.allCategories as category}
+								{#each data.allCategories as category (category.id)}
 									<label
 										class="flex cursor-pointer items-center gap-2 rounded-md border border-transparent p-2 transition-colors hover:border-border hover:bg-muted"
 									>
@@ -299,7 +296,7 @@
 				</div>
 
 				<div class="grid gap-6">
-					{#each localTestcases as tc, i}
+					{#each localTestcases as tc, i (tc)}
 						<Card.Root
 							class={cn(
 								'relative border-2 transition-all',

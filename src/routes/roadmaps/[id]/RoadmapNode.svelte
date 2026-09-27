@@ -1,17 +1,21 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Handle, Position, type NodeProps } from '@xyflow/svelte';
-	import { Badge } from '$lib/components/ui/badge';
 	import { Lock, Unlock, CheckCircle2 } from '@lucide/svelte';
 
-	let { data, id }: NodeProps = $props();
+	let { data }: NodeProps = $props();
 
-	const { label, problemsetId, progress } = data as {
+	type RoadmapNodeData = {
 		label: string;
 		problemsetId: number;
 		progress: { total: number; solved: number; isCompleted: boolean; isLocked: boolean };
 	};
 
-	const percentage = progress.total > 0 ? Math.round((progress.solved / progress.total) * 100) : 0;
+	const { label, problemsetId, progress } = $derived(data as RoadmapNodeData);
+
+	const percentage = $derived(
+		progress.total > 0 ? Math.round((progress.solved / progress.total) * 100) : 0
+	);
 </script>
 
 <div
@@ -48,7 +52,7 @@
 			</div>
 			{#if !progress.isLocked}
 				<a
-					href={`/problemsets/${problemsetId}`}
+					href={resolve('/problemsets/[id]', { id: String(problemsetId) })}
 					class="absolute inset-0 z-10 block rounded-lg focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none"
 				>
 					<span class="sr-only">{label} 문제집으로 이동</span>
