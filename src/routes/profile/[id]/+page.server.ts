@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { user, submissions, problems } from '$lib/server/db/schema';
+import { user, problemSubmissions, solvedProblems } from '$lib/server/db/schema';
 import { error } from '@sveltejs/kit';
 import { eq, count, desc } from 'drizzle-orm';
 
@@ -14,17 +14,16 @@ export const load = async ({ params }) => {
 		throw error(404, '유저를 찾을 수 없습니다.');
 	}
 
-	// 해결한 문제 수 조회 (상태가 'AC' 또는 'Accepted'인 유일한 문제 수)
+	// 해결한 문제 수: solved_problems는 (user, problem)당 한 행이므로 그대로 센다
 	const solvedCountResult = await db
 		.select({ value: count() })
-		.from(submissions)
-		.where(eq(submissions.userId, userId))
-		.where(eq(submissions.status, 'Accepted')); // 실제 상태값에 따라 조정 필요
+		.from(solvedProblems)
+		.where(eq(solvedProblems.userId, userId));
 
-	// 최근 제출 내역
-	const recentSubmissions = await db.query.submissions.findMany({
-		where: eq(submissions.userId, userId),
-		orderBy: [desc(submissions.createdAt)],
+	// 최근 제출 내역 (테스트케이스별 submissions가 아닌 문제 단위 제출)
+	const recentSubmissions = await db.query.problemSubmissions.findMany({
+		where: eq(problemSubmissions.userId, userId),
+		orderBy: [desc(problemSubmissions.createdAt)],
 		limit: 10,
 		with: {
 			problem: true
